@@ -203,6 +203,7 @@
 				84627ABE2AA9AA2B00415827 /* Protecto-Pass-Info.plist */,
 				842EAC8029D832680014C8F8 /* Protecto PassTests */,
 				842EAC8A29D832680014C8F8 /* Protecto PassUITests */,
+				844EFAEA2D2D84B00027A90C /* Frameworks */,
 				842EAC6829D832670014C8F8 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -387,6 +388,13 @@
 			name = Shared;
 			path = "/Users/jules/Library/Mobile Documents/com~apple~CloudDocs/Second Brain/Arbeit/Business/Development/Xcode/Protecto-Pass/Shared";
 			sourceTree = "<absolute>";
+		};
+		844EFAEA2D2D84B00027A90C /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
 		};
 		84627ABF2AA9C9A200415827 /* Settings */ = {
 			isa = PBXGroup;

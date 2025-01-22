@@ -16,14 +16,16 @@ internal struct ME_ContentViewFolderSection: View {
     @ObservedObject private var dataStructure : ME_DataStructure<String, Date, Folder, Entry, LoadableResource>
     
     internal init(
-        dataStructure : ME_DataStructure<String, Date, Folder, Entry, LoadableResource>
+        dataStructure : ME_DataStructure<String, Date, Folder, Entry, LoadableResource>,
+        folderDelete : Binding<Bool>
     ) {
         self.dataStructure = dataStructure
+        self.folderDeletionConfiramtionShown = folderDelete
     }
     
     @State private var selectedFolder : Folder?
     
-    @State private var folderDeletionConfiramtionShown : Bool = false
+    private var folderDeletionConfiramtionShown : Binding<Bool>
     
     @State private var errDeletionShown : Bool = false
     
@@ -42,12 +44,12 @@ internal struct ME_ContentViewFolderSection: View {
                     .contextMenu {
                         Button(role: .destructive) {
                             selectedFolder = folder
-                            folderDeletionConfiramtionShown.toggle()
+                            folderDeletionConfiramtionShown.wrappedValue.toggle()
                         } label: {
                             Label("Delete Folder", systemImage: "trash")
                         }
                     }
-                    .alert("Delete Folder?", isPresented: $folderDeletionConfiramtionShown) {
+                    .alert("Delete Folder?", isPresented: folderDeletionConfiramtionShown) {
                         Button("Continue", role: .destructive) {
                             do {
                                 dataStructure.folders.removeAll(where: { $0.id == selectedFolder!.id })
@@ -58,7 +60,7 @@ internal struct ME_ContentViewFolderSection: View {
                             }
                         }
                         Button("Cancel", role: .cancel) {
-                            folderDeletionConfiramtionShown.toggle()
+                            folderDeletionConfiramtionShown.wrappedValue.toggle()
                         }
                     } message: {
                         Text("This Folder and all it's content will be deleted\nThis action is irreversible")
@@ -79,7 +81,9 @@ internal struct ME_ContentViewFolderSection: View {
     
     @Previewable @State var dataStructure : ME_DataStructure<String, Date, Folder, Entry, LoadableResource> = Database.previewDB
     
+    @Previewable @State var folderDelete : Bool = false
+    
     List {
-        ME_ContentViewFolderSection(dataStructure: dataStructure)
+        ME_ContentViewFolderSection(dataStructure: dataStructure, folderDelete: $folderDelete)
     }
 }

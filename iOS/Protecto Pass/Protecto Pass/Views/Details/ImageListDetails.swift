@@ -15,17 +15,15 @@ internal struct ImageListDetails: View {
     /// The full database needed to store it
     @EnvironmentObject private var db : Database
     
-    @Binding internal var images : [DB_Image]
-    
-    @Binding internal var videos : [DB_Video]
+    @Binding internal var audioVisualObjects : [LoadableResource]
     
     @State private var imageDetailsPresented : Bool = false
     
-    @State private var selectedImage : DB_Image?
+    @State private var selectedObject : LoadableResource?
     
     @State private var addImagePresented : Bool = false
     
-    @State private var itemsSlected : [PhotosPickerItem] = []
+    @State private var itemsSelected : [PhotosPickerItem] = []
     
     @State private var imageDeleted : Bool = false
     
@@ -36,42 +34,44 @@ internal struct ImageListDetails: View {
             // TODO: GeometryReader destorys Layout, find workaround
             GeometryReader {
                 metrics in
-                LazyVGrid(
-                    columns: [
-                        GridItem(
-                            .fixed(metrics.size.width / 3),
-                            spacing: 2
-                        ),
-                        GridItem(
-                            .fixed(metrics.size.width / 3),
-                            spacing: 2
-                        ),
-                        GridItem(
-                            .fixed(metrics.size.width / 3),
-                            spacing: 2
-                        ),
-                    ],
-                    spacing: 2
-                ) {
-                    ForEach(images) {
-                        image in
-                        Button {
-                            selectedImage = image
-                            imageDetailsPresented.toggle()
-                        } label: {
-                            Image(uiImage: image.image)
-                                .resizable()
-                                .frame(
-                                    width: metrics.size.width / 3,
-                                    height: metrics.size.width / 3
-                                )
+                ScrollView {
+                    LazyVGrid(
+                        columns: [
+                            GridItem(
+                                .fixed(metrics.size.width / 3),
+                                spacing: 2
+                            ),
+                            GridItem(
+                                .fixed(metrics.size.width / 3),
+                                spacing: 2
+                            ),
+                            GridItem(
+                                .fixed(metrics.size.width / 3),
+                                spacing: 2
+                            ),
+                        ],
+                        spacing: 2
+                    ) {
+                        ForEach(audioVisualObjects, id: \.id) {
+                            lr in
+                            Button {
+                                selectedObject = lr
+                                imageDetailsPresented.toggle()
+                            } label: {
+                                Image(uiImage: UIImage(data: lr.thumbnailData)!)
+                                    .resizable()
+                                    .frame(
+                                        width: metrics.size.width / 3,
+                                        height: metrics.size.width / 3
+                                    )
+                            }
                         }
                     }
                 }
             }
             .photosPicker(
                 isPresented: $addImagePresented,
-                selection: $itemsSlected,
+                selection: $itemsSelected,
                 maxSelectionCount: 100,
                 selectionBehavior: .continuousAndOrdered,
                 matching: .any(of: [.images, .videos]),
@@ -81,31 +81,31 @@ internal struct ImageListDetails: View {
                 Task {
                     do {
                         try await PhotoPickerHandler.handlePhotoPickerInput(
-                            items: itemsSlected,
+                            items: itemsSelected,
                             pickerPresented: addImagePresented,
-                            images: $images,
-                            videos: $videos,
+                            loadableResources: $audioVisualObjects,
                             storeIn: db,
                             with: context,
                             onSuperID: superID
                         )
+                        guard !addImagePresented else { return }
+                        itemsSelected.removeAll()
                     }
                 }
             }
-            // TODO: change to binding(?) and dialog
+              // TODO: change to binding(?) and dialog
             .onChange(of: imageDeleted) {
-                let image = images.first(where: { $0.id == selectedImage!.id })
-                images.removeAll(where: { $0 == image })
                 do {
-                    try Storage.deleteImage(id: image!.id, in: db, with: context)
-                    images.removeAll(where: { $0.id == image!.id })
+                    try Storage.deleteImage(id: selectedObject!.id, in: db, with: context)
+                    audioVisualObjects.removeAll(where: { $0.id == selectedObject!.id })
+                    selectedObject = nil
                     // TODO: remove loadable resource reference
                 } catch {
                     // TODO: handle error
                 }
             }
             .sheet(isPresented: $imageDetailsPresented) {
-                ImageDetails(image: $selectedImage, deleted: $imageDeleted)
+                ImageDetails(image: selectedObject, deleted: $imageDeleted)
             }
             .navigationTitle("Images & Videos")
             .navigationBarTitleDisplayMode(.automatic)
@@ -127,14 +127,12 @@ internal struct ImageListDetails: View {
 
 internal struct ImageListDetails_Previews: PreviewProvider {
     
-    @State static private var images : [DB_Image] = [DB_Image.previewImage]
-    
-    @State static private var videos : [DB_Video] = []
+    @State static private var objects : [LoadableResource] = []
     
     @StateObject static private var db : Database = Database.previewDB
     
     static var previews: some View {
-        ImageListDetails(images: $images, videos: $videos, superID: db.id)
+        ImageListDetails(audioVisualObjects: $objects, superID: db.id)
             .environmentObject(db)
     }
 }

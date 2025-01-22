@@ -22,31 +22,32 @@ internal struct ME_ContentViewImageSection: View {
         dataStructure: ME_DataStructure<String, Date, Folder, Entry, LoadableResource>,
         metrics : GeometryProxy,
         errSavingPresented : Binding<Bool>,
-        audioVisualItemsToAdd : Binding<[PhotosPickerItem]>
+        audioVisualItemsToAdd : Binding<[PhotosPickerItem]>,
+        addImagePresented : Binding<Bool>
     ) {
         self.dataStructure = dataStructure
         self.metrics = metrics
         self.errSavingPresented = errSavingPresented
         self.audioVisualItemsToAdd = audioVisualItemsToAdd
+        self.addImagePresented = addImagePresented
+        self.audioVisualObjects = dataStructure.images + dataStructure.videos
     }
     
     /* DATA VARIABLES */
     
-    @State private var images : [DB_Image] = []
-    
-    @State private var videos : [DB_Video] = []
+    @State private var audioVisualObjects : [LoadableResource]
     
     /* SELECTED OBJECT VARIABLES */
     
-    @State private var selectedImage : DB_Image?
+    @State private var selectedImage : LoadableResource?
     
-    @State private var selectedVideo : DB_Video?
+    @State private var selectedVideo : LoadableResource?
     
     /* SHEET CONTROL VARIABLES */
     
-    @State private var imageDetailsPresented : Bool = false
+    @State private var detailsPresented : Bool = false
     
-    @State private var addImagePresented : Bool = false
+    private var addImagePresented : Binding<Bool>
     
     /* DELETION CONFIRMATION DIALOG CONTROL VARIABLES */
     
@@ -71,28 +72,11 @@ internal struct ME_ContentViewImageSection: View {
     /// The Photos and videos selected to add to the Password Safe
     private var audioVisualItemsToAdd : Binding<[PhotosPickerItem]>
     
-    /// Displays an alert displaying an error while loading resources
-    @State private var errLoadingResourcesShown : Bool = false
-    
-    /// Loads images and videos and stores them in the corresponding variables
-    private func loadResources() -> Void {
-        var imageIDs : [UUID] = []
-        var videoIDs : [UUID] = []
-        dataStructure.images.forEach({ imageIDs.append($0.id) })
-        dataStructure.videos.forEach({ videoIDs.append($0.id) })
-        do {
-            images = try Storage.loadImages(db, ids: imageIDs, context: context)
-            videos = try Storage.loadVideos(db, ids: videoIDs, context: context)
-        } catch {
-            errLoadingResourcesShown.toggle()
-        }
-    }
-    
     
     var body: some View {
         Section("Images") {
-            if !images.isEmpty {
-                if images.count <= 9 {
+            if !dataStructure.images.isEmpty || !dataStructure.videos.isEmpty {
+                if (dataStructure.images.count + dataStructure.videos.count) <= 9 {
                     GroupBox {
                         LazyVGrid(
                             columns: [
@@ -111,13 +95,13 @@ internal struct ME_ContentViewImageSection: View {
                             ],
                             spacing: 2
                         ) {
-                            ForEach(images) {
-                                image in
+                            ForEach((dataStructure.images + dataStructure.videos), id: \.id) {
+                                lr in
                                 Button {
-                                    selectedImage = image
-                                    imageDetailsPresented.toggle()
+                                    selectedImage = lr
+                                    detailsPresented.toggle()
                                 } label: {
-                                    Image(uiImage: image.image)
+                                    Image(uiImage: UIImage(data: lr.thumbnailData)!)
                                         .resizable()
                                         .frame(
                                             width: metrics.size.width / 3,
@@ -126,25 +110,25 @@ internal struct ME_ContentViewImageSection: View {
                                 }
                                 .contextMenu {
                                     Button(role: .destructive) {
-                                        selectedImage = image
+                                        selectedImage = lr
                                         imageDeletionConfirmationShown.toggle()
                                     } label: {
                                         Label("Delete Image", systemImage: "trash")
                                     }
                                 }
-                                .sheet(isPresented: $imageDetailsPresented) {
-                                    ImageDetails(image: $selectedImage, deleted: $imageDeletionConfirmationShown)
+                                .sheet(isPresented: $detailsPresented) {
+                                    ImageDetails(
+                                        image: selectedImage,
+                                        deleted: $imageDeletionConfirmationShown
+                                    )
                                 }
                                 .alert("Delete Image?", isPresented: $imageDeletionConfirmationShown) {
                                     Button("Continue", role: .destructive) {
-                                        let loadableResource : LoadableResource = dataStructure.images.first(where: { $0.id == selectedImage!.id })!
                                         do {
-                                            images.removeAll(where: { $0.id == selectedImage!.id })
                                             dataStructure.images.removeAll(where: { $0.id == selectedImage!.id })
                                             try Storage.deleteImage(id: selectedImage!.id, in: db, with: context)
                                         } catch {
-                                            images.append(selectedImage!)
-                                            dataStructure.images.append(loadableResource)
+                                            dataStructure.images.append(selectedImage!)
                                             errImageDeletionShown = true
                                         }
                                     }
@@ -156,14 +140,11 @@ internal struct ME_ContentViewImageSection: View {
                                 }
                                 .alert("Delete Video?", isPresented: $videoDeletionConfirmationShown) {
                                     Button("Continue", role: .destructive) {
-                                        let loadableResource : LoadableResource = dataStructure.videos.first(where: { $0.id == selectedVideo!.id })!
                                         do {
-                                            videos.removeAll(where: { $0.id == selectedImage!.id })
                                             dataStructure.videos.removeAll(where: { $0.id == selectedImage!.id })
                                             try Storage.deleteVideo(id: selectedVideo!.id, in: db, with: context)
                                         } catch {
-                                            videos.append(selectedVideo!)
-                                            dataStructure.videos.append(loadableResource)
+                                            dataStructure.videos.append(selectedVideo!)
                                             errVideoDeletionShown = true
                                         }
                                     }
@@ -186,19 +167,16 @@ internal struct ME_ContentViewImageSection: View {
                     }
                 } else {
                     NavigationLink {
-                        ImageListDetails(images: $images, videos: $videos, superID: dataStructure.id)
+                        ImageListDetails(audioVisualObjects: $dataStructure.images, superID: dataStructure.id)
                             .environmentObject(db)
                     } label: {
-                        Label("Show all images (\(images.count))", systemImage: "photo")
+                        Label("Show all images (\(dataStructure.images.count))", systemImage: "photo")
                     }
                     .foregroundStyle(.primary)
                 }
             } else {
                 Text("No Images found")
             }
-        }
-        .onAppear {
-            loadResources()
         }
         .alert("Error loading Image", isPresented: $errLoadingImagePresented) {
         } message: {
@@ -208,22 +186,19 @@ internal struct ME_ContentViewImageSection: View {
         } message: {
             Text("There's been an error while trying to load this video")
         }
-        .alert("Error loading resources", isPresented: $errLoadingResourcesShown) {
-        } message: {
-            Text("There's been an error while trying to load the resources from the file system")
-        }
-        .onChange(of: addImagePresented) {
+        .onChange(of: addImagePresented.wrappedValue) {
             Task {
                 do {
                     try await PhotoPickerHandler.handlePhotoPickerInput(
                         items: audioVisualItemsToAdd.wrappedValue,
-                        pickerPresented: addImagePresented,
-                        images: $images,
-                        videos: $videos,
+                        pickerPresented: addImagePresented.wrappedValue,
+                        loadableResources: $audioVisualObjects,
                         storeIn: db,
                         with: context,
                         onSuperID: dataStructure.id
                     )
+                    guard !addImagePresented.wrappedValue else { return }
+                    audioVisualItemsToAdd.wrappedValue.removeAll()
                 } catch is PhotoPickerImageConverterError {
                     errLoadingImagePresented.toggle()
                 } catch is PhotoPickerVideoConverterError {
@@ -244,6 +219,8 @@ internal struct ME_ContentViewImageSection: View {
     
     @Previewable @State var audioVisualItemsToAdd : [PhotosPickerItem] = []
     
+    @Previewable @State var addImagePresented : Bool = false
+    
     List {
         GeometryReader {
             metrics in
@@ -251,7 +228,8 @@ internal struct ME_ContentViewImageSection: View {
                 dataStructure: dataStructure,
                 metrics: metrics,
                 errSavingPresented: $errSavingPresented,
-                audioVisualItemsToAdd: $audioVisualItemsToAdd
+                audioVisualItemsToAdd: $audioVisualItemsToAdd,
+                addImagePresented: $addImagePresented
             )
         }
     }

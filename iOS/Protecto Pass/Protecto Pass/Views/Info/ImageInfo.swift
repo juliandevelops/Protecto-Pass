@@ -11,16 +11,16 @@ internal struct ImageInfo: View {
     
     @Environment(\.dismiss) private var dismiss
     
-    internal let image : DB_Image
+    internal let image : DB_Image?
     
     var body: some View {
         List {
             Section("General") {
-                ListTile(name: "Quality", data: String(image.quality))
+                ListTile(name: "Quality", data: String(image!.quality))
             }
             Section("Timeline") {
-                ListTile(name: "Created", date: image.created)
-                ListTile(name: "Last edited", date: image.lastEdited)
+                ListTile(name: "Created", date: image!.created)
+                ListTile(name: "Last edited", date: image!.lastEdited)
             }
         }
         .navigationTitle("Details")

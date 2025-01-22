@@ -15,8 +15,7 @@ internal struct PhotoPickerHandler {
     internal static nonisolated func handlePhotoPickerInput(
         items : [PhotosPickerItem],
         pickerPresented : Bool,
-        images : Binding<[DB_Image]>,
-        videos : Binding<[DB_Video]>,
+        loadableResources : Binding<[LoadableResource]>,
         storeIn db : Database,
         with context : NSManagedObjectContext,
         onSuperID superID : UUID
@@ -25,6 +24,7 @@ internal struct PhotoPickerHandler {
         guard !pickerPresented else { return }
         var selectedDB_Videos : [DB_Video] = []
         var selectedDB_Images : [DB_Image] = []
+        var selectedLoadableResources : [LoadableResource] = []
         for item in items {
             if item.supportedContentTypes.contains(where: { $0.isSubtype(of: .audiovisualContent ) }) {
                 do {
@@ -69,8 +69,6 @@ internal struct PhotoPickerHandler {
                 newElements: newElements,
                 superID: superID
             )
-            images.wrappedValue.append(contentsOf: selectedDB_Images)
-            videos.wrappedValue.append(contentsOf: selectedDB_Videos)
         } catch {
             throw PhotoPickerResultsSavingError()
         }

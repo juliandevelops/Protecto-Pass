@@ -72,6 +72,12 @@ internal struct ME_ContentView : View {
     
     /// Presents an alert stating an error has appeared in saving the database when set to true
     @State private var errSavingPresented : Bool = false
+    
+    // Deleting
+    
+    @State private var entryDelete : Bool = false
+    
+    @State private var folderDelete : Bool = false
 
     
     var body: some View {
@@ -87,15 +93,21 @@ internal struct ME_ContentView : View {
                             .padding()
                     }
                 }
-                ME_ContentViewEntrySection(dataStructure: dataStructure, selectedEntry: $selectedEntry, entryDetailsPresented: $entryDetailsPresented)
+                ME_ContentViewEntrySection(
+                    dataStructure: dataStructure,
+                    selectedEntry: $selectedEntry,
+                    entryDetailsPresented: $entryDetailsPresented,
+                    entryDelete: $entryDelete
+                )
                     .environmentObject(db)
-                ME_ContentViewFolderSection(dataStructure: dataStructure)
+                ME_ContentViewFolderSection(dataStructure: dataStructure, folderDelete: $folderDelete)
                     .environmentObject(db)
                 ME_ContentViewImageSection(
                     dataStructure: dataStructure,
                     metrics: metrics,
                     errSavingPresented: $errSavingPresented,
-                    audioVisualItemsToAdd: $audioVisualItemsSelected
+                    audioVisualItemsToAdd: $audioVisualItemsSelected,
+                    addImagePresented: $addImagePresented
                 )
                 .environmentObject(db)
                 ME_ContentViewDocumentSection(
@@ -159,6 +171,15 @@ internal struct ME_ContentView : View {
                     } label: {
                         Label("Edit", systemImage: "pencil")
                     }
+                    if dataStructure is Folder {
+                        Divider()
+                        Button(role: .destructive) {
+                            // TODO: deleting folder from here does nothing
+                            folderDelete.toggle()
+                        } label: {
+                            Label("Delete Folder", systemImage: "trash")
+                        }
+                    }
                 } label: {
                     Image(systemName: "plus")
                 }
@@ -169,7 +190,7 @@ internal struct ME_ContentView : View {
             Me_Details(me: dataStructure)
         }
         .sheet(isPresented: $entryDetailsPresented) {
-            EntryDetails(entry: $selectedEntry)
+            EntryDetails(entry: $selectedEntry, entryDeleted: $entryDelete)
         }
         // Edit / Add sheets
         .sheet(isPresented: $addEntryPresented) {

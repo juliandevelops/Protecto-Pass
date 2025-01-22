@@ -58,6 +58,10 @@ internal class ME_DataStructure<DA, DE, F, E, L> : NativeType<DE, DA, L> {
             id: id
         )
     }
+    
+    internal func getImagesAndVideos() -> [L] {
+        images + videos
+    }
 }
 
 /// Protocol which most of the Decrypted Data Structures conform to in order to use them in

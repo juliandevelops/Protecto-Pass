@@ -17,6 +17,8 @@ internal struct EntryDetails: View {
     
     @Binding internal var entry : Entry?
     
+    @Binding internal var entryDeleted : Bool
+    
     @State private var passwordShown : Bool = false
     
     @State private var documents : [DB_Document] = []
@@ -143,7 +145,7 @@ internal struct EntryDetails: View {
                         }
                         Divider()
                         Button(role: .destructive) {
-                            
+                            entryDeleted.toggle()
                         } label: {
                             Label("Delete", systemImage: "trash")
                         }
@@ -169,14 +171,15 @@ internal struct EntryDetails: View {
     }
 }
 
-internal struct EntryDetails_Previews: PreviewProvider {
+
+#Preview {
     
-    @State private static var entry : Entry? = Entry.previewEntry
+    @Previewable @State var entry : Entry? = Entry.previewEntry
     
-    @StateObject private static var database : Database = Database.previewDB
+    @Previewable @StateObject var database : Database = Database.previewDB
     
-    static var previews: some View {
-        EntryDetails(entry: $entry)
-            .environmentObject(database)
-    }
+    @Previewable @State var entryDelete : Bool = false
+    
+    EntryDetails(entry: $entry, entryDeleted: $entryDelete)
+        .environmentObject(database)
 }

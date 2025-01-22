@@ -70,16 +70,4 @@ internal struct DataConverter {
     internal static func dataToDouble(_ data : Data) -> Double {
         return Double(dataToString(data))!
     }
-    
-    
-    // UUID <-> DATA
-    
-    // TODO: is this function needed?
-    internal static func dataToUUID(_ data : Data) -> UUID {
-        return UUID(uuidString: dataToString(data))!
-    }
-    
-    internal static func uuidToData(_ uuid : UUID) -> Data {
-        return stringToData(uuid.uuidString)
-    }
 }

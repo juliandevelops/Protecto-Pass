@@ -17,19 +17,21 @@ internal struct ME_ContentViewEntrySection: View {
     
     private var selectedEntry : Binding<Entry?>
     
-    @State private var entryDetailsPresented : Binding<Bool>
+    private var entryDetailsPresented : Binding<Bool>
     
     internal init(
         dataStructure : ME_DataStructure<String, Date, Folder, Entry, LoadableResource>,
         selectedEntry : Binding<Entry?>,
-        entryDetailsPresented : Binding<Bool>
+        entryDetailsPresented : Binding<Bool>,
+        entryDelete : Binding<Bool>
     ) {
         self.dataStructure = dataStructure
         self.selectedEntry = selectedEntry
         self.entryDetailsPresented = entryDetailsPresented
+        self.entryDeletionConfirmationShown = entryDelete
     }
     
-    @State private var entryDeletionConfirmationShown : Bool = false
+    private var entryDeletionConfirmationShown : Binding<Bool>
     
     @State private var errDeletionShown : Bool = false
     
@@ -48,12 +50,12 @@ internal struct ME_ContentViewEntrySection: View {
                     .contextMenu {
                         Button(role: .destructive) {
                             selectedEntry.wrappedValue = entry
-                            entryDeletionConfirmationShown.toggle()
+                            entryDeletionConfirmationShown.wrappedValue.toggle()
                         } label: {
                             Label("Delete Entry", systemImage: "trash")
                         }
                     }
-                    .alert("Delete Entry?", isPresented: $entryDeletionConfirmationShown) {
+                    .alert("Delete Entry?", isPresented: entryDeletionConfirmationShown) {
                         Button("Continue", role: .destructive) {
                             do {
                                 dataStructure.entries.removeAll(where: { $0.id == selectedEntry.wrappedValue!.id })
@@ -64,7 +66,7 @@ internal struct ME_ContentViewEntrySection: View {
                             }
                         }
                         Button("Cancel", role: .cancel) {
-                            entryDeletionConfirmationShown.toggle()
+                            entryDeletionConfirmationShown.wrappedValue.toggle()
                         }
                     } message: {
                         Text("This Entry and all its connected documents will be deleted\nThis action is irreversible")
@@ -87,9 +89,16 @@ internal struct ME_ContentViewEntrySection: View {
     
     @Previewable @State var detailsPresented : Bool = false
     
+    @Previewable @State var entryDelete : Bool = false
+    
     @Previewable @State var dataStructure : ME_DataStructure<String, Date, Folder, Entry, LoadableResource> = Database.previewDB
     
     List {
-        ME_ContentViewEntrySection(dataStructure: dataStructure, selectedEntry: $selectedEntry, entryDetailsPresented: $detailsPresented)
+        ME_ContentViewEntrySection(
+            dataStructure: dataStructure,
+            selectedEntry: $selectedEntry,
+            entryDetailsPresented: $detailsPresented,
+            entryDelete: $entryDelete
+        )
     }
 }
