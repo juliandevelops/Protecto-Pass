@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 56;
+	objectVersion = 90;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -174,24 +174,18 @@
 /* Begin PBXFrameworksBuildPhase section */
 		842EAC6429D832670014C8F8 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
 			files = (
 			);
-			runOnlyForDeploymentPostprocessing = 0;
 		};
 		842EAC7A29D832680014C8F8 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
 			files = (
 			);
-			runOnlyForDeploymentPostprocessing = 0;
 		};
 		842EAC8429D832680014C8F8 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
 			files = (
 			);
-			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
@@ -348,12 +342,12 @@
 			isa = PBXGroup;
 			children = (
 				843390592C99A7E800ED4349 /* CoreDataManager.swift */,
-				8433905A2C99A7E800ED4349 /* DatabaseDoesNotExistError.swift */,
 				8433905B2C99A7E800ED4349 /* DatabaseFileManager.swift */,
 				8433905C2C99A7E800ED4349 /* NonexistendPathError.swift */,
 				8433905D2C99A7E800ED4349 /* Persistence.swift */,
 				8433905E2C99A7E800ED4349 /* SandboxManager.swift */,
 				8433905F2C99A7E800ED4349 /* Storage.swift */,
+				8433905A2C99A7E800ED4349 /* DatabaseDoesNotExistError.swift */,
 			);
 			path = Storage;
 			sourceTree = "<group>";
@@ -530,8 +524,6 @@
 			);
 			buildRules = (
 			);
-			dependencies = (
-			);
 			name = "Protecto Pass";
 			productName = "Protecto Pass";
 			productReference = 842EAC6729D832670014C8F8 /* Protecto Pass.app */;
@@ -581,7 +573,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1430;
-				LastUpgradeCheck = 1630;
+				LastUpgradeCheck = 2610;
 				TargetAttributes = {
 					842EAC6629D832670014C8F8 = {
 						CreatedOnToolsVersion = 14.3;
@@ -597,7 +589,6 @@
 				};
 			};
 			buildConfigurationList = 842EAC6229D832670014C8F8 /* Build configuration list for PBXProject "Protecto Pass" */;
-			compatibilityVersion = "Xcode 14.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -608,6 +599,7 @@
 				es,
 			);
 			mainGroup = 842EAC5E29D832670014C8F8;
+			preferredProjectObjectVersion = 90;
 			productRefGroup = 842EAC6829D832670014C8F8 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -622,34 +614,27 @@
 /* Begin PBXResourcesBuildPhase section */
 		842EAC6529D832670014C8F8 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
 			files = (
 				842EAC7229D832680014C8F8 /* Preview Assets.xcassets in Resources */,
 				846302332AA99F7600C051E3 /* Settings.bundle in Resources */,
 				842EAC6F29D832680014C8F8 /* Assets.xcassets in Resources */,
 			);
-			runOnlyForDeploymentPostprocessing = 0;
 		};
 		842EAC7B29D832680014C8F8 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
 			files = (
 			);
-			runOnlyForDeploymentPostprocessing = 0;
 		};
 		842EAC8529D832680014C8F8 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
 			files = (
 			);
-			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		842EAC6329D832670014C8F8 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
 			files = (
 				84F6ABF82AE7DA2A00D0B633 /* AppData.swift in Sources */,
 				848EFE092CA33A1F006EA4DD /* ME_ContentViewDocumentSection.swift in Sources */,
@@ -714,24 +699,19 @@
 				84DB4F902A739D9100C2DD0E /* Me_Details.swift in Sources */,
 				841E86E12AAB222800B03F37 /* AddDB_CompactMode.swift in Sources */,
 			);
-			runOnlyForDeploymentPostprocessing = 0;
 		};
 		842EAC7929D832680014C8F8 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
 			files = (
 				842EAC8229D832680014C8F8 /* Protecto_PassTests.swift in Sources */,
 			);
-			runOnlyForDeploymentPostprocessing = 0;
 		};
 		842EAC8329D832680014C8F8 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
 			files = (
 				842EAC8C29D832680014C8F8 /* Protecto_PassUITests.swift in Sources */,
 				842EAC8E29D832680014C8F8 /* Protecto_PassUITestsLaunchTests.swift in Sources */,
 			);
-			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
@@ -749,7 +729,7 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
-		842EAC8F29D832680014C8F8 /* Debug */ = {
+		842EAC8F29D832680014C8F8 /* Debug configuration for PBXProject "Protecto Pass" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -808,12 +788,13 @@
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
 		};
-		842EAC9029D832680014C8F8 /* Release */ = {
+		842EAC9029D832680014C8F8 /* Release configuration for PBXProject "Protecto Pass" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -865,13 +846,14 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
 		};
-		842EAC9229D832680014C8F8 /* Debug */ = {
+		842EAC9229D832680014C8F8 /* Debug configuration for PBXNativeTarget "Protecto Pass" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -881,17 +863,20 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"Protecto Pass/Preview Content\"";
+				ENABLE_ENHANCED_SECURITY = YES;
+				ENABLE_POINTER_AUTHENTICATION = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "Protecto-Pass-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "Protecto Pass";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
+				INFOPLIST_KEY_NSFaceIDUsageDescription = "Protecto Pass uses Face ID to unlock the App via your Face";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
-				IPHONEOS_DEPLOYMENT_TARGET = 18.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -905,7 +890,7 @@
 			};
 			name = Debug;
 		};
-		842EAC9329D832680014C8F8 /* Release */ = {
+		842EAC9329D832680014C8F8 /* Release configuration for PBXNativeTarget "Protecto Pass" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -915,17 +900,20 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"Protecto Pass/Preview Content\"";
+				ENABLE_ENHANCED_SECURITY = YES;
+				ENABLE_POINTER_AUTHENTICATION = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "Protecto-Pass-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "Protecto Pass";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
+				INFOPLIST_KEY_NSFaceIDUsageDescription = "Protecto Pass uses Face ID to unlock the App via your Face";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
-				IPHONEOS_DEPLOYMENT_TARGET = 18.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -939,7 +927,7 @@
 			};
 			name = Release;
 		};
-		842EAC9529D832680014C8F8 /* Debug */ = {
+		842EAC9529D832680014C8F8 /* Debug configuration for PBXNativeTarget "Protecto PassTests" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
@@ -957,7 +945,7 @@
 			};
 			name = Debug;
 		};
-		842EAC9629D832680014C8F8 /* Release */ = {
+		842EAC9629D832680014C8F8 /* Release configuration for PBXNativeTarget "Protecto PassTests" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
@@ -975,7 +963,7 @@
 			};
 			name = Release;
 		};
-		842EAC9829D832680014C8F8 /* Debug */ = {
+		842EAC9829D832680014C8F8 /* Debug configuration for PBXNativeTarget "Protecto PassUITests" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
@@ -992,7 +980,7 @@
 			};
 			name = Debug;
 		};
-		842EAC9929D832680014C8F8 /* Release */ = {
+		842EAC9929D832680014C8F8 /* Release configuration for PBXNativeTarget "Protecto PassUITests" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
@@ -1015,37 +1003,33 @@
 		842EAC6229D832670014C8F8 /* Build configuration list for PBXProject "Protecto Pass" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				842EAC8F29D832680014C8F8 /* Debug */,
-				842EAC9029D832680014C8F8 /* Release */,
+				842EAC8F29D832680014C8F8 /* Debug configuration for PBXProject "Protecto Pass" */,
+				842EAC9029D832680014C8F8 /* Release configuration for PBXProject "Protecto Pass" */,
 			);
-			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
 		842EAC9129D832680014C8F8 /* Build configuration list for PBXNativeTarget "Protecto Pass" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				842EAC9229D832680014C8F8 /* Debug */,
-				842EAC9329D832680014C8F8 /* Release */,
+				842EAC9229D832680014C8F8 /* Debug configuration for PBXNativeTarget "Protecto Pass" */,
+				842EAC9329D832680014C8F8 /* Release configuration for PBXNativeTarget "Protecto Pass" */,
 			);
-			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
 		842EAC9429D832680014C8F8 /* Build configuration list for PBXNativeTarget "Protecto PassTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				842EAC9529D832680014C8F8 /* Debug */,
-				842EAC9629D832680014C8F8 /* Release */,
+				842EAC9529D832680014C8F8 /* Debug configuration for PBXNativeTarget "Protecto PassTests" */,
+				842EAC9629D832680014C8F8 /* Release configuration for PBXNativeTarget "Protecto PassTests" */,
 			);
-			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
 		842EAC9729D832680014C8F8 /* Build configuration list for PBXNativeTarget "Protecto PassUITests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				842EAC9829D832680014C8F8 /* Debug */,
-				842EAC9929D832680014C8F8 /* Release */,
+				842EAC9829D832680014C8F8 /* Debug configuration for PBXNativeTarget "Protecto PassUITests" */,
+				842EAC9929D832680014C8F8 /* Release configuration for PBXNativeTarget "Protecto PassUITests" */,
 			);
-			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
