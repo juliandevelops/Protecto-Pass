@@ -70,7 +70,7 @@ internal struct Welcome: View {
                             Button {
                                 navigationSheet.databaseAddingSheetShown.toggle()
                             } label: {
-                                Label("Create new one", systemImage: "plus")
+                                Label("Create Database", systemImage: "plus")
                             }
                             //                            Button {
                             //                                selectorPresented.toggle()

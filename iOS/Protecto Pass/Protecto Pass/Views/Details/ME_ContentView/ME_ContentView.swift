@@ -100,16 +100,16 @@ internal struct ME_ContentView : View {
                     entryDelete: $entryDelete
                 )
                     .environmentObject(db)
-                ME_ContentViewFolderSection(dataStructure: dataStructure, folderDelete: $folderDelete)
-                    .environmentObject(db)
-                ME_ContentViewImageSection(
-                    dataStructure: dataStructure,
-                    metrics: metrics,
-                    errSavingPresented: $errSavingPresented,
-                    audioVisualItemsToAdd: $audioVisualItemsSelected,
-                    addImagePresented: $addImagePresented
-                )
-                .environmentObject(db)
+//                ME_ContentViewFolderSection(dataStructure: dataStructure, folderDelete: $folderDelete)
+//                    .environmentObject(db)
+//                ME_ContentViewImageSection(
+//                    dataStructure: dataStructure,
+//                    metrics: metrics,
+//                    errSavingPresented: $errSavingPresented,
+//                    audioVisualItemsToAdd: $audioVisualItemsSelected,
+//                    addImagePresented: $addImagePresented
+//                )
+//                .environmentObject(db)
                 ME_ContentViewDocumentSection(
                     dataStructure: dataStructure,
                     errSavingPresented: $errSavingPresented,
@@ -126,8 +126,7 @@ internal struct ME_ContentView : View {
         .toolbar {
             if dataStructure is Database {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button(role: .cancel) {
-                        // TODO: add closing Database Code
+                    Button {
                         navigationController.db = nil
                         withAnimation {
                             navigationController.openDatabaseToHome.toggle()
@@ -144,16 +143,16 @@ internal struct ME_ContentView : View {
                     } label: {
                         Label("Add Entry", systemImage: "doc")
                     }
-                    Button {
-                        addFolderPresented.toggle()
-                    } label: {
-                        Label("Add Folder", systemImage: "folder")
-                    }
-                    Button {
-                        addImagePresented.toggle()
-                    } label: {
-                        Label("Add Images & Videos", systemImage: "photo")
-                    }
+//                    Button {
+//                        addFolderPresented.toggle()
+//                    } label: {
+//                        Label("Add Folder", systemImage: "folder")
+//                    }
+//                    Button {
+//                        addImagePresented.toggle()
+//                    } label: {
+//                        Label("Add Images & Videos", systemImage: "photo")
+//                    }
                     Button {
                         addDocPresented.toggle()
                     } label: {

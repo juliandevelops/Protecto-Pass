@@ -38,10 +38,10 @@ internal struct Me_Details: View {
                         let entriesCount = counter.getEntriesCount()
                         let documentsCount = counter.getDocumentsCount()
                         let imagesCount = counter.getImagesCount()
-                        Text("\(foldersCount) \(foldersCount == 1 ? "Folder" : "Folders")")
+//                        Text("\(foldersCount) \(foldersCount == 1 ? "Folder" : "Folders")")
                         Text("\(entriesCount) \(entriesCount == 1 ? "Entry" : "Entries")")
                         Text("\(documentsCount) \(documentsCount == 1 ? "Document" : "Documents")")
-                        Text("\(imagesCount) \(imagesCount == 1 ? "Image" : "Images")")
+//                        Text("\(imagesCount) \(imagesCount == 1 ? "Image" : "Images")")
                     }
                 } header: {
                     Text("Content")

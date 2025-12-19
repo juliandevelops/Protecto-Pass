@@ -57,6 +57,7 @@
 		848480B429EFF09D008EA77C /* AddDB.swift in Sources */ = {isa = PBXBuildFile; fileRef = 848480B329EFF09D008EA77C /* AddDB.swift */; };
 		84889ECF2C8CDA2F0066F7CB /* DocumentDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84889ECE2C8CDA2F0066F7CB /* DocumentDetails.swift */; };
 		84889ED22C8DB84E0066F7CB /* DocumentInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84889ED12C8DB84E0066F7CB /* DocumentInfo.swift */; };
+		848AC7C52EF5A5AB000542C2 /* Protecto Pass.icon in Resources */ = {isa = PBXBuildFile; fileRef = 848AC7C42EF5A5AB000542C2 /* Protecto Pass.icon */; };
 		848DE6842AA742CA00AE99EE /* ImageDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = 848DE6832AA742CA00AE99EE /* ImageDetails.swift */; };
 		848EFE052CA3334D006EA4DD /* ME_ContentViewFolderSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 848EFE042CA3334D006EA4DD /* ME_ContentViewFolderSection.swift */; };
 		848EFE072CA336E9006EA4DD /* ME_ContentViewImageSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 848EFE062CA336E9006EA4DD /* ME_ContentViewImageSection.swift */; };
@@ -150,6 +151,7 @@
 		848480B329EFF09D008EA77C /* AddDB.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddDB.swift; sourceTree = "<group>"; };
 		84889ECE2C8CDA2F0066F7CB /* DocumentDetails.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentDetails.swift; sourceTree = "<group>"; };
 		84889ED12C8DB84E0066F7CB /* DocumentInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentInfo.swift; sourceTree = "<group>"; };
+		848AC7C42EF5A5AB000542C2 /* Protecto Pass.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = "Protecto Pass.icon"; sourceTree = "<group>"; };
 		848DE6832AA742CA00AE99EE /* ImageDetails.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageDetails.swift; sourceTree = "<group>"; };
 		848EFE042CA3334D006EA4DD /* ME_ContentViewFolderSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ME_ContentViewFolderSection.swift; sourceTree = "<group>"; };
 		848EFE062CA336E9006EA4DD /* ME_ContentViewImageSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ME_ContentViewImageSection.swift; sourceTree = "<group>"; };
@@ -199,6 +201,7 @@
 				842EAC8A29D832680014C8F8 /* Protecto PassUITests */,
 				844EFAEA2D2D84B00027A90C /* Frameworks */,
 				842EAC6829D832670014C8F8 /* Products */,
+				848AC7C42EF5A5AB000542C2 /* Protecto Pass.icon */,
 			);
 			sourceTree = "<group>";
 		};
@@ -615,6 +618,7 @@
 		842EAC6529D832670014C8F8 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			files = (
+				848AC7C52EF5A5AB000542C2 /* Protecto Pass.icon in Resources */,
 				842EAC7229D832680014C8F8 /* Preview Assets.xcassets in Resources */,
 				846302332AA99F7600C051E3 /* Settings.bundle in Resources */,
 				842EAC6F29D832680014C8F8 /* Assets.xcassets in Resources */,
@@ -856,7 +860,7 @@
 		842EAC9229D832680014C8F8 /* Debug configuration for PBXNativeTarget "Protecto Pass" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_APPICON_NAME = "Protecto Pass";
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_ENTITLEMENTS = "Protecto Pass/Protecto Pass.entitlements";
@@ -893,7 +897,7 @@
 		842EAC9329D832680014C8F8 /* Release configuration for PBXNativeTarget "Protecto Pass" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_APPICON_NAME = "Protecto Pass";
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_ENTITLEMENTS = "Protecto Pass/Protecto Pass.entitlements";
