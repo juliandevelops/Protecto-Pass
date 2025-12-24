@@ -9,7 +9,6 @@
 //  Renamed by Julian Schumacher to Welcome.swift on 18.04.23.
 //
 
-//import CoreData
 import SwiftUI
 
 /// The View that is shown to the User as soon as

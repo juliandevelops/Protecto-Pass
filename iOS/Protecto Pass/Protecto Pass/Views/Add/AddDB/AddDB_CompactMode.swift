@@ -66,6 +66,11 @@ internal struct AddDB_CompactMode: View {
     /// this Database in
     @State private var path : URL? = nil
 
+    // TODO: make iterations and key length user custom
+    @State private var iterations : Int64 = 500000
+
+    @State private var keyLength : Int32 = 32
+
     /// Whether the directory selector is presented or not
     @State private var selectorPresented : Bool = false
 
@@ -236,6 +241,8 @@ internal struct AddDB_CompactMode: View {
                 encryption: encryption,
                 storageType: storage,
                 salt: PasswordGenerator.generateSalt(),
+                iterationsCount: iterations,
+                keyLength: keyLength,
                 path: path
             ),
             key: PasswordGenerator.generateKey(),

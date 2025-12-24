@@ -334,6 +334,7 @@
 		843390582C99A7E800ED4349 /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				846444DB2EFC0B6000A59BC7 /* Generated */,
 				843390542C99A7E800ED4349 /* Database */,
 				843390562C99A7E800ED4349 /* DB_Creation */,
 				843390572C99A7E800ED4349 /* Protecto_Pass.xcdatamodeld */,
@@ -400,6 +401,13 @@
 				84F6ABF72AE7DA2A00D0B633 /* AppData.swift */,
 			);
 			path = Settings;
+			sourceTree = "<group>";
+		};
+		846444DB2EFC0B6000A59BC7 /* Generated */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Generated;
 			sourceTree = "<group>";
 		};
 		846E689B2A703EB800BC049A /* Navigation */ = {

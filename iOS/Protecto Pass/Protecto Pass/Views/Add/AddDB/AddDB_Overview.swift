@@ -29,7 +29,12 @@ internal struct AddDB_Overview: View {
     
     /// The Type of Storage used to store this Database
     @State private var storage : Storage.StorageType = .CoreData
-    
+
+    // TODO: make iterations and key length user custom
+    @State private var iterations : Int64 = 500000
+
+    @State private var keyLength : Int32 = 32
+
     /// Whether the password is shown or not
     @State private var passwordShown : Bool = false
     
@@ -136,6 +141,8 @@ internal struct AddDB_Overview: View {
                 encryption: creationWrapper.encryption,
                 storageType: creationWrapper.storageType,
                 salt: PasswordGenerator.generateSalt(),
+                iterationsCount: iterations,
+                keyLength: keyLength,
                 path: creationWrapper.path
             ),
             key: PasswordGenerator.generateKey(),

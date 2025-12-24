@@ -38,7 +38,15 @@ internal struct EntryDetails: View {
                     Group {
                         Menu {
                             Button {
-                                UIPasteboard.general.string = entry!.username
+                                // https://stackoverflow.com/a/63006562
+                                UIPasteboard.general.setItems(
+                                    [
+                                        [UIPasteboard.typeAutomatic: entry!.password]
+                                    ],
+                                    options: [
+                                        UIPasteboard.OptionsKey.expirationDate: Date().addingTimeInterval(30)
+                                    ]
+                                )
                             } label: {
                                 Label("Copy Username", systemImage: "list.clipboard")
                             }
