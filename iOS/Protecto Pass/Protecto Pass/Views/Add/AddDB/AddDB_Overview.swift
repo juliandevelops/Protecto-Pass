@@ -126,31 +126,41 @@ internal struct AddDB_Overview: View {
         creationWrapper.encryption = encryption
         creationWrapper.storageType = storage
         creationWrapper.path = path
-        navigationController.db = Database(
-            name: creationWrapper.name,
-            description: creationWrapper.description,
-            folders: [],
-            entries: [],
-            images: [],
-            videos: [],
-            iconName: creationWrapper.iconName,
-            documents: [],
-            created: Date.now,
-            lastEdited: Date.now,
-            header: DB_Header(
-                encryption: creationWrapper.encryption,
-                storageType: creationWrapper.storageType,
-                salt: PasswordGenerator.generateSalt(),
-                iterationsCount: iterations,
-                keyLength: keyLength,
-                path: creationWrapper.path
-            ),
-            key: PasswordGenerator.generateKey(),
-            password: creationWrapper.password,
-            // TODO: change
-            allowBiometrics: true,
-            id: UUID()
-        )
+        let salt = PasswordGenerator.generateSalt()
+        do {
+            navigationController.db = Database(
+                name: creationWrapper.name,
+                description: creationWrapper.description,
+                folders: [],
+                entries: [],
+                images: [],
+                videos: [],
+                iconName: creationWrapper.iconName,
+                documents: [],
+                created: Date.now,
+                lastEdited: Date.now,
+                header: DB_Header(
+                    encryption: creationWrapper.encryption,
+                    storageType: creationWrapper.storageType,
+                    salt: salt,
+                    iterationsCount: iterations,
+                    keyLength: keyLength,
+                    path: creationWrapper.path
+                ),
+                key: PasswordGenerator.generateKey(),
+                derivedKey: try PasswordGenerator.deriveKey(
+                    password: creationWrapper.password,
+                    salt: salt,
+                    iterationsCount: iterations,
+                    keyLength: UInt32(keyLength)
+                ),
+                // TODO: change
+                allowBiometrics: true,
+                id: UUID()
+            )
+        } catch {
+            errSavingPresented.toggle()
+        }
         do {
             try Storage.storeDatabase(navigationController.db!, context: viewContext, superID: navigationController.db!.id)
             navigationController.openDatabaseToHome.toggle()

@@ -226,30 +226,40 @@ internal struct AddDB_CompactMode: View {
         }
         // TODO: these three lines as well as the data in the creation Wrapper may be pointless
         // They are still entered, in case the creation process will expand one day
-        navigationController.db = Database(
-            name: name,
-            description: description,
-            folders: [],
-            entries: [],
-            images: [],
-            videos: [],
-            iconName: iconName,
-            documents: [],
-            created: Date.now,
-            lastEdited: Date.now,
-            header: DB_Header(
-                encryption: encryption,
-                storageType: storage,
-                salt: PasswordGenerator.generateSalt(),
-                iterationsCount: iterations,
-                keyLength: keyLength,
-                path: path
-            ),
-            key: PasswordGenerator.generateKey(),
-            password: password,
-            allowBiometrics: allowBiometrics,
-            id: UUID()
-        )
+        let salt = PasswordGenerator.generateSalt()
+        do {
+            navigationController.db = Database(
+                name: name,
+                description: description,
+                folders: [],
+                entries: [],
+                images: [],
+                videos: [],
+                iconName: iconName,
+                documents: [],
+                created: Date.now,
+                lastEdited: Date.now,
+                header: DB_Header(
+                    encryption: encryption,
+                    storageType: storage,
+                    salt: salt,
+                    iterationsCount: iterations,
+                    keyLength: keyLength,
+                    path: path
+                ),
+                key: PasswordGenerator.generateKey(),
+                derivedKey: try PasswordGenerator.deriveKey(
+                    password: password,
+                    salt: salt,
+                    iterationsCount: iterations,
+                    keyLength: UInt32(keyLength)
+                ),
+                allowBiometrics: allowBiometrics,
+                id: UUID()
+            )
+        } catch {
+            errSavingPresented.toggle()
+        }
         do {
             try Storage.storeDatabase(navigationController.db!, context: viewContext, superID: navigationController.db!.id)
             navigationController.openDatabaseToHome.toggle()

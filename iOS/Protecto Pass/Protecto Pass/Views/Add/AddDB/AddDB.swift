@@ -59,8 +59,10 @@ internal struct AddDB: View {
                     } message: {
                         Text("A Name for the Database is required.\nPlease enter one")
                     }
-                TextField("Description", text: $description)
-                    .keyboardType(.asciiCapable)
+                    TextField("Description", text: $description, axis: .vertical)
+                        .lineLimit(3...5)
+                        .keyboardType(.asciiCapable)
+
             }
             .textInputAutocapitalization(.sentences)
             .textCase(.none)
