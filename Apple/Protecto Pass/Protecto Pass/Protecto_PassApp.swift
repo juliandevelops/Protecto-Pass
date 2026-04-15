@@ -40,6 +40,7 @@ internal struct Protecto_PassApp: App {
 
     var body: some Scene {
         WindowGroup {
+            // TODO: add debugger recognition and prevent startup when debugger is active
             SetUpView()
                 .environment(\.managedObjectContext, persistenceController.container.viewContext)
                 .environment(\.largeScreen, largeScreen)
@@ -63,6 +64,7 @@ internal struct Protecto_PassApp: App {
                             let settings : [Settings : Bool] = try SettingsHelper.load(context: persistenceController.container.viewContext)
                             largeScreen = settings[.largeScreen]!
                             compactMode = settings[.compactMode]!
+                            // TODO: hide screen here (or somewhere else?)
                         } catch {
                             errLoadingSettingsShown.toggle()
                         }

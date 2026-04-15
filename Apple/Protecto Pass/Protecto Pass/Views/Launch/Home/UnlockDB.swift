@@ -11,11 +11,11 @@ import SwiftUI
 internal struct UnlockDB: View {
     
     @Environment(\.dismiss) private var dismiss
-    
+
     @EnvironmentObject private var navigationSheet : AddDB_Navigation
     
     /// The Encrypted Database the User wants to unlock
-    @Binding internal var db : EncryptedDatabase
+    @Binding internal var encryptedDatabase : EncryptedDatabase
     
     /// The unlocked Database
     @State private var unlockedDB : Database? = nil
@@ -27,9 +27,12 @@ internal struct UnlockDB: View {
     /// When an error occurs while trying to unlock the Database,
     /// toggle this to show the error message
     @State private var errDecryptingPresented : Bool = false
-    
+
+    /// Whether the information popover is visible
     @State private var informationPopoverPresented : Bool = false
-    
+
+    /// The database Content counter object used to count objects in the datrabase if possible
+    /// (currently only possible if database is stored in CoreData as object hierarchy is visible there)
     @State private var dbContentCounter : DatabaseContentCounter?
     
     var body: some View {
@@ -37,8 +40,8 @@ internal struct UnlockDB: View {
             VStack(alignment: .leading) {
                 Section {
                     Section {
-                        Text("Encrypted with \(db.header.encryption.rawValue)")
-                        Text("Stored in \(db.header.storageType.rawValue)")
+                        Text("Encrypted with \(encryptedDatabase.header.encryption.rawValue)")
+                        Text("Stored in \(encryptedDatabase.header.storageType.rawValue)")
                     } header: {
                         Text("General")
                             .font(.headline)
@@ -75,16 +78,16 @@ internal struct UnlockDB: View {
                         .font(.title)
                     Divider()
                 } footer: {
-                    Text(db.description)
+                    Text(encryptedDatabase.details)
                 }
                 PasswordField(title: "Enter your Password...", text: $password)
                     .multilineTextAlignment(.leading)
                     .textFieldStyle(.roundedBorder)
             }
             .onAppear {
-                dbContentCounter = DatabaseContentCounter(for: db)
+                dbContentCounter = DatabaseContentCounter(for: encryptedDatabase)
             }
-            .navigationTitle("Unlock \(db.name)")
+            .navigationTitle("Unlock \(encryptedDatabase.name)")
             .navigationBarTitleDisplayMode(.automatic)
             .padding(20)
             .alert("Error Unlock Database", isPresented: $errDecryptingPresented) {
@@ -117,10 +120,10 @@ internal struct UnlockDB: View {
             let entriesCount = counter.getEntriesCount()
             let documentsCount = counter.getDocumentsCount()
             let imagesCount = counter.getImagesCount()
-//            Text("• \(foldersCount) \(foldersCount == 1 ? "Folder" : "Folders")")
+            Text("• \(foldersCount) \(foldersCount == 1 ? "Folder" : "Folders")")
             Text("• \(entriesCount) \(entriesCount == 1 ? "Entry" : "Entries")")
             Text("• \(documentsCount) \(documentsCount == 1 ? "Document" : "Documents")")
-//            Text("• \(imagesCount) \(imagesCount == 1 ? "Image" : "Images")")
+            Text("• \(imagesCount) \(imagesCount == 1 ? "Image" : "Images")")
         } else {
             EmptyView()
         }
@@ -129,15 +132,21 @@ internal struct UnlockDB: View {
     /// Try to unlock the Database with the provided password
     private func tryUnlocking() -> Void {
         do {
-            var decrypter = Decrypter.configure(for: db, with: password)
-            let localDatabase : Database = try decrypter.decrypt()
-            unlockedDB = localDatabase
-            navigationSheet.db = unlockedDB
-            dismiss()
-            navigationSheet.openDatabaseToHome.toggle()
+            // Local copy of password as secure key bytes to pass to new vault session
+            let passwordAsSecureBytes : SecureKeyBytes = try SecureKeyBytes(
+                copying: DataConverter.stringToData(password),
+                count: password.count
+            )
+            let vaultSession : VaultSession = try VaultSession(
+                userPassword: passwordAsSecureBytes,
+                encryptedDatabase: encryptedDatabase
+            )
+            navigationSheet.vaultSession = vaultSession
         } catch {
             errDecryptingPresented.toggle()
         }
+        dismiss()
+        navigationSheet.openDatabaseToHome.toggle()
     }
     
     
@@ -148,6 +157,6 @@ internal struct UnlockDB_Previews: PreviewProvider {
     
     @State private static var db : EncryptedDatabase = EncryptedDatabase.previewDB
     static var previews: some View {
-        UnlockDB(db: $db)
+        UnlockDB(encryptedDatabase: $db)
     }
 }

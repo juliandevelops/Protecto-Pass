@@ -28,7 +28,7 @@ internal struct Storage {
     }
     
     /// Loads all the Databases from the different Storage Options
-    internal static func load(with context : NSManagedObjectContext, and paths : [URL]) throws -> [EncryptedDatabase] {
+    internal static func load(with context : NSManagedObjectContext, usingFilepaths paths : [URL]) throws -> [EncryptedDatabase] {
         var result : [EncryptedDatabase] = []
         // Core Data
         let coreData : [EncryptedDatabase] = try CoreDataManager.load(with: context)
@@ -36,7 +36,7 @@ internal struct Storage {
         // File System
 //        let fileSystem : [EncryptedDatabase] = try DatabaseFileManager.load(from: paths)
 //        result.append(contentsOf: fileSystem)
-        result.sort(by: { $0.lastEdited < $1.lastEdited })
+        result.sort(by: { $0.lastEditedDate < $1.lastEditedDate })
         return result
     }
     
@@ -72,82 +72,38 @@ internal struct Storage {
     
     /// Stores the passed Database to the right Storage.
     /// if you want to store something in Core Data, the connected context has to be provided.
-    internal static func storeDatabase(_ db : Database, context : NSManagedObjectContext?, newElements : [DatabaseContent<Date>] = [], superID : UUID) throws -> Void {
-        var localDocuments : [Encrypted_DB_Document] = []
-        var localImages : [Encrypted_DB_Image] = []
-        var localVideos : [Encrypted_DB_Video] = []
-        let encrypter : Encrypter = Encrypter.configure(for: db)
-        let superDataStructure : ME_DataStructure<String, Date, Folder, Entry, LoadableResource> = (db.id == superID) ? db : getFolderIfExists(ds: db, id: superID)!
-        for element in newElements {
-            switch element {
-                case is Entry:
-                    let inputEntry = element as! Entry
-                    if let entry = getEntryIfExists(ds: db, id: element.id) {
-                        let editedEntry = inputEntry
-                        entry.title = editedEntry.title
-                        entry.username = editedEntry.username
-                        entry.password = editedEntry.password
-                        entry.url = editedEntry.url
-                        entry.notes = editedEntry.notes
-                        entry.iconName = editedEntry.iconName
-                        entry.documents = editedEntry.documents
-                        entry.lastEdited = Date.now
-                    } else {
-                        superDataStructure.entries.append(inputEntry)
-                    }
-                case is Folder:
-                    let inputFolder = element as! Folder
-                    if let folder = getFolderIfExists(ds: db, id: element.id) {
-                        let editedFolder = inputFolder
-                        folder.name = editedFolder.name
-                        folder.description = editedFolder.description
-                        folder.iconName = editedFolder.iconName
-                        folder.lastEdited = editedFolder.lastEdited
-                    } else {
-                        superDataStructure.folders.append(inputFolder)
-                    }
-                case is DB_Document:
-                    // TOOD: Check if element exists and delete it, so new one can be stored
-                    let doc = element as! DB_Document
-                    localDocuments.append(try encrypter.encryptDocument(doc))
-                    superDataStructure.documents.append(LoadableResource(id: doc.id, name: doc.name, thumbnailData: DataConverter.stringToData("doc")))
-                case is DB_Image:
-                    let im = element as! DB_Image
-                    localImages.append(try encrypter.encryptImage(im))
-                    superDataStructure.images.append(LoadableResource(id: im.id, thumbnailData: im.image.jpegData(compressionQuality: 0.1)!))
-                case is DB_Video:
-                    let vid = element as! DB_Video
-                    localVideos.append(try encrypter.encryptVideo(vid))
-                    // TODO: add thumbnail data
-                    superDataStructure.videos.append(LoadableResource(id: vid.id, thumbnailData: Data()))
-                default:
-                    continue
-            }
-        }
-        let database : EncryptedDatabase = try encrypter.encrypt()
-        for image in localImages {
-            try storeImage(image, in: database, context: context)
-        }
-        for document in localDocuments {
-            try storeDocument(document, in: database, context: context)
-        }
-        for video in localVideos {
-            try storeVideo(video, in: database, context: context)
-        }
+    internal static func storeDatabase(
+        _ db : EncryptedDatabase,
+        context : NSManagedObjectContext?
+    ) throws -> Void {
         switch db.header.storageType {
             case .CoreData:
                 assert(context != nil, "To store Core Data Databases, a Context must be provided to the storeDatabase Function")
                 try CoreDataManager.storeDatabase(
-                    database,
+                    db,
                     context: context!
                 )
             case .File:
                 break
-//                try DatabaseFileManager.storeDatabase(database)
+//                try DatabaseFileManager.storeDatabase(db)
         }
     }
     
-    private static func getFolderIfExists(ds : ME_DataStructure<String, Date, Folder, Entry, LoadableResource>, id : UUID) -> Folder? {
+    private static func getFolderIfExists(
+        ds : DB_ME_DataStructure<
+                String,
+                Date,
+                DB_Folder,
+                DB_Entry,
+                DB_LoadableResource,
+                DB_CreditCard,
+                DB_Note,
+                DB_Passkey,
+                UUID,
+                DB_Tag
+        >,
+        id : UUID
+    ) -> DB_Folder? {
         for folder in ds.folders {
             if folder.id == id { return folder } else { continue }
         }
@@ -157,7 +113,21 @@ internal struct Storage {
         return nil
     }
     
-    private static func getEntryIfExists(ds : ME_DataStructure<String, Date, Folder, Entry, LoadableResource>, id : UUID) -> Entry? {
+    private static func getEntryIfExists(
+        ds : DB_ME_DataStructure<
+                String,
+                Date,
+                DB_Folder,
+                DB_Entry,
+                DB_LoadableResource,
+                DB_CreditCard,
+                DB_Note,
+                DB_Passkey,
+                UUID,
+                DB_Tag
+            >,
+            id : UUID
+    ) -> DB_Entry? {
         for entry in ds.entries {
             if entry.id == id { return entry } else { continue }
         }
@@ -207,20 +177,20 @@ internal struct Storage {
         try CoreDataManager.deleteDatabase(id, with: context)
     }
     
-    internal static func deleteImage(id : UUID, in db : Database, with context : NSManagedObjectContext) throws -> Void {
-        try CoreDataManager.deleteImage(id: id, context: context)
-        try storeDatabase(db, context: context, superID: db.id)
-    }
-    
-    internal static func deleteVideo(id : UUID, in db : Database, with context : NSManagedObjectContext) throws -> Void {
-        try CoreDataManager.deleteVideo(id: id, context: context)
-        try storeDatabase(db, context: context, superID: db.id)
-    }
-    
-    internal static func deleteDocument(id : UUID, in db : Database, with context : NSManagedObjectContext) throws -> Void {
-        try CoreDataManager.deleteDocument(id: id, context: context)
-        try storeDatabase(db, context: context, superID: db.id)
-    }
+//    internal static func deleteImage(id : UUID, in db : Database, with context : NSManagedObjectContext) throws -> Void {
+//        try CoreDataManager.deleteImage(id: id, context: context)
+//        try storeDatabase(db, context: context)
+//    }
+//    
+//    internal static func deleteVideo(id : UUID, in db : Database, with context : NSManagedObjectContext) throws -> Void {
+//        try CoreDataManager.deleteVideo(id: id, context: context)
+//        try storeDatabase(db, context: context)
+//    }
+//    
+//    internal static func deleteDocument(id : UUID, in db : Database, with context : NSManagedObjectContext) throws -> Void {
+//        try CoreDataManager.deleteDocument(id: id, context: context)
+//        try storeDatabase(db, context: context)
+//    }
     
     /// Resets all Data of this App and the connected Cloud Container
     internal static func clearAll(context: NSManagedObjectContext) throws -> Void {

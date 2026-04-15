@@ -30,9 +30,11 @@ internal struct FileImportHandler {
                                 document: data,
                                 type: file.pathExtension.lowercased(),
                                 name: file.lastPathComponent,
-                                created: Date.now,
-                                lastEdited: Date.now,
-                                id: UUID()
+                                createdDate: Date.now,
+                                lastEditedDate: Date.now,
+                                lastAccessedDate: Date.now,
+                                id: UUID(),
+                                tags: []
                             )
                         )
                     } catch {
@@ -42,7 +44,7 @@ internal struct FileImportHandler {
                 }
                 documents.wrappedValue.append(contentsOf: docs)
                 do {
-                    try Storage.storeDatabase(db, context: context, newElements: docs, superID: superID)
+//                    try Storage.storeDatabase(db, context: context, newElements: docs, superID: superID)
                 } catch {
                     throw DocumentSavingError()
                 }

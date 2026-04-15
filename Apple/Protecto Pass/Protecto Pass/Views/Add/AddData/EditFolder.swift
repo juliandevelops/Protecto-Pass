@@ -14,7 +14,9 @@ import SwiftUI
 internal struct EditFolder: View {
     
     @Environment(\.managedObjectContext) private var context
-    
+
+    @EnvironmentObject private var vaultSession : VaultSession
+
     @Environment(\.dismiss) private var dismiss
     
     @EnvironmentObject private var db : Database
@@ -22,8 +24,8 @@ internal struct EditFolder: View {
     /// The name of the Folder
     @State private var name : String = ""
     
-    @State private var description : String = ""
-    
+    @State private var details : String = ""
+
     /// The parent folder of this Folder
     @State private var superID : UUID
     
@@ -35,17 +37,17 @@ internal struct EditFolder: View {
     
     @State private var iconChooserShown : Bool = false
     
-    @State private var folder : Folder? = nil
-    
+    @State private var folder : DB_Folder? = nil
+
     internal init(
         storeIn superID : UUID,
-        folder : Folder? = nil
+        folder : DB_Folder? = nil
     ) {
         self.superID = superID
         if let f = folder {
             self.folder = f
             name = f.name
-            description = f.description
+            details = f.details
             iconName = f.iconName
         }
     }
@@ -66,7 +68,7 @@ internal struct EditFolder: View {
                 }
                 Section("Information") {
                     TextField("Name", text: $name)
-                    TextField("Description", text: $description, axis: .vertical)
+                    TextField("Description", text: $details, axis: .vertical)
                         .lineLimit(3...10)
                 }
                 Section("Storing") {
@@ -106,26 +108,32 @@ internal struct EditFolder: View {
     /// Saves the Data and dismisses this View
     private func save() -> Void {
         do {
-            try Storage.storeDatabase(
-                db,
-                context: context,
-                newElements: [
-                    Folder(
-                        name: name,
-                        description: description,
-                        folders: folder?.folders ?? [],
-                        entries: folder?.entries ?? [],
-                        images: folder?.images ?? [],
-                        videos: folder?.videos ?? [],
-                        iconName: iconName,
-                        documents: folder?.documents ?? [],
-                        created: folder?.created ?? Date.now,
-                        lastEdited: Date.now,
-                        id: folder?.id ?? UUID()
-                    )
-                ],
-                superID: superID
-            )
+            try vaultSession.store(context: context)
+//            try Storage.storeDatabase(
+//                db,
+//                context: context,
+//                newElements: [
+//                    DB_Folder(
+//                        name: name,
+//                        details: details,
+//                        folders: folder?.folders ?? [],
+//                        entries: folder?.entries ?? [],
+//                        images: folder?.images ?? [],
+//                        videos: folder?.videos ?? [],
+//                        creditCards: folder?.creditCards ?? [],
+//                        notes: folder?.notes ?? [],
+//                        passkeys: folder?.passkeys ?? [],
+//                        iconName: iconName,
+//                        documents: folder?.documents ?? [],
+//                        createdDate: folder?.createdDate ?? Date.now,
+//                        lastEditedDate: Date.now,
+//                        lastAccessedDate: Date.now,
+//                        id: folder?.id ?? UUID(),
+//                        tags: folder?.tags ?? [],
+//                    )
+//                ],
+//                superID: superID
+//            )
             dismiss()
         } catch {
             errStoring.toggle()

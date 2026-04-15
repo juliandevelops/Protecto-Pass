@@ -14,12 +14,34 @@ internal struct ME_ContentViewImageSection: View {
     
     @EnvironmentObject private var db : Database
     
-    @ObservedObject private var dataStructure : ME_DataStructure<String, Date, Folder, Entry, LoadableResource>
-    
+    @ObservedObject private var dataStructure :  DB_ME_DataStructure<
+        String,
+        Date,
+        DB_Folder,
+        DB_Entry,
+        DB_LoadableResource,
+        DB_CreditCard,
+        DB_Note,
+        DB_Passkey,
+        UUID,
+        DB_Tag
+    >
+
     private var metrics : GeometryProxy
     
     internal init(
-        dataStructure: ME_DataStructure<String, Date, Folder, Entry, LoadableResource>,
+        dataStructure:  DB_ME_DataStructure<
+        String,
+        Date,
+        DB_Folder,
+        DB_Entry,
+        DB_LoadableResource,
+        DB_CreditCard,
+        DB_Note,
+        DB_Passkey,
+        UUID,
+        DB_Tag
+        >,
         metrics : GeometryProxy,
         errSavingPresented : Binding<Bool>,
         audioVisualItemsToAdd : Binding<[PhotosPickerItem]>,
@@ -35,13 +57,13 @@ internal struct ME_ContentViewImageSection: View {
     
     /* DATA VARIABLES */
     
-    @State private var audioVisualObjects : [LoadableResource]
-    
+    @State private var audioVisualObjects : [DB_LoadableResource]
+
     /* SELECTED OBJECT VARIABLES */
     
-    @State private var selectedImage : LoadableResource?
-    
-    @State private var selectedVideo : LoadableResource?
+    @State private var selectedImage : DB_LoadableResource?
+
+    @State private var selectedVideo : DB_LoadableResource?
     
     /* SHEET CONTROL VARIABLES */
     
@@ -126,7 +148,7 @@ internal struct ME_ContentViewImageSection: View {
                                     Button("Continue", role: .destructive) {
                                         do {
                                             dataStructure.images.removeAll(where: { $0.id == selectedImage!.id })
-                                            try Storage.deleteImage(id: selectedImage!.id, in: db, with: context)
+//                                            try Storage.deleteImage(id: selectedImage!.id, in: db, with: context)
                                         } catch {
                                             dataStructure.images.append(selectedImage!)
                                             errImageDeletionShown = true
@@ -142,7 +164,7 @@ internal struct ME_ContentViewImageSection: View {
                                     Button("Continue", role: .destructive) {
                                         do {
                                             dataStructure.videos.removeAll(where: { $0.id == selectedImage!.id })
-                                            try Storage.deleteVideo(id: selectedVideo!.id, in: db, with: context)
+//                                            try Storage.deleteVideo(id: selectedVideo!.id, in: db, with: context)
                                         } catch {
                                             dataStructure.videos.append(selectedVideo!)
                                             errVideoDeletionShown = true
@@ -213,24 +235,35 @@ internal struct ME_ContentViewImageSection: View {
 
 #Preview {
     
-    @Previewable @State var dataStructure : ME_DataStructure<String, Date, Folder, Entry, LoadableResource> = Database.previewDB
-    
+    @Previewable @State var dataStructure :  DB_ME_DataStructure<
+        String,
+        Date,
+        DB_Folder,
+        DB_Entry,
+        DB_LoadableResource,
+        DB_CreditCard,
+        DB_Note,
+        DB_Passkey,
+        UUID,
+        DB_Tag
+    > = Database.previewDB
+
     @Previewable @State var errSavingPresented : Bool = false
     
     @Previewable @State var audioVisualItemsToAdd : [PhotosPickerItem] = []
     
     @Previewable @State var addImagePresented : Bool = false
     
-    List {
-        GeometryReader {
-            metrics in
-            ME_ContentViewImageSection(
-                dataStructure: dataStructure,
-                metrics: metrics,
-                errSavingPresented: $errSavingPresented,
-                audioVisualItemsToAdd: $audioVisualItemsToAdd,
-                addImagePresented: $addImagePresented
-            )
-        }
-    }
+//    List {
+//        GeometryReader {
+//            metrics in
+//            ME_ContentViewImageSection(
+//                dataStructure: dataStructure,
+//                metrics: metrics,
+//                errSavingPresented: $errSavingPresented,
+//                audioVisualItemsToAdd: $audioVisualItemsToAdd,
+//                addImagePresented: $addImagePresented
+//            )
+//        }
+//    }
 }

@@ -46,8 +46,10 @@ internal struct SettingsHelper {
     /// Whether the Paths of the databases should be synced to iCloud or not
     private static var iCloudPaths : Bool = true
 
+    /// Whether the large screen setting is activated or not
     private static var largeScreen : Bool = false
-    
+
+    /// Whether the compactMode is activated or not
     private static var compactMode : Bool = false
     
     

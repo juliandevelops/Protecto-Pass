@@ -21,17 +21,16 @@ internal struct PersistenceController {
         for i in 0..<10 {
             let db : CD_Database = CD_Database(context: viewContext)
             db.name = DataConverter.stringToData("Database \(i)")
-            db.dataDescription = DataConverter.stringToData("This is the Database Number \(i)")
+            db.details = DataConverter.stringToData("This is the Database Number \(i)")
             db.iconName = DataConverter.stringToData("externaldrive")
             let header : CD_DB_Header = CD_DB_Header(context: viewContext)
             header.encryption = Cryptography.Encryption.AES256.rawValue
             header.storageType = Storage.StorageType.CoreData.rawValue
             header.salt = try! PasswordGenerator.generateSalt()
-            header.iterationsCount = 500000
-            header.keyLength = 32
+            header.keyParams = CD_DB_HeaderKeyParameters(context: viewContext)
             db.header = header
-            db.created = DataConverter.dateToData(Date.now)
-            db.lastEdited = DataConverter.dateToData(Date.now)
+            db.createdDate = DataConverter.dateToData(Date.now)
+            db.lastEditedDate = DataConverter.dateToData(Date.now)
         }
         do {
             try viewContext.save()

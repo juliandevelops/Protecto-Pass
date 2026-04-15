@@ -12,28 +12,32 @@ import SwiftUI
 internal struct Home: View {
     
     /// The Database that the User has just unlocked
-    @StateObject internal var db : Database
-    
+    @EnvironmentObject private var navigationSheet : AddDB_Navigation
+
     /// Whether the Popover on the action button is presented or not
     @State private var addPopoverPresented : Bool = false
     
     var body: some View {
         NavigationStack {
-            ME_ContentView(db)
-                .environmentObject(db)
+            ME_ContentView(navigationSheet.vaultSession!.database)
+                .environmentObject(navigationSheet.vaultSession!)
         }
     }
 }
 
+/// Preview of the preview database in the home view
 internal struct Home_Previews: PreviewProvider {
+    // TODO: add environment object in preview
     static var previews: some View {
-        Home(db: Database.previewDB)
+        Home()
     }
 }
 
+/// Preview of the preview database with the largeScreen Mode active
 internal struct Home_LargeScreen_Previews: PreviewProvider {
+    // TODO: add environment object in preview
     static var previews: some View {
-        Home(db: Database.previewDB)
+        Home()
             .environment(\.largeScreen, true)
     }
 }

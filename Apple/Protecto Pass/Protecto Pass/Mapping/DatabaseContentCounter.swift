@@ -11,11 +11,35 @@ internal struct DatabaseContentCounter {
     
     private var isEncrypted : Bool
     
-    private var dataStructure : ME_DataStructure<String, Date, Folder, Entry, LoadableResource>?
-    
+    private var dataStructure : DB_ME_DataStructure<
+        String,
+        Date,
+        DB_Folder,
+        DB_Entry,
+        DB_LoadableResource,
+        DB_CreditCard,
+        DB_Note,
+        DB_Passkey,
+        UUID,
+        DB_Tag
+    >?
+
     private var db : EncryptedDatabase?
     
-    internal init(for dataStructure : ME_DataStructure<String, Date, Folder, Entry, LoadableResource>) {
+    internal init(
+        for dataStructure : DB_ME_DataStructure<
+        String,
+        Date,
+        DB_Folder,
+        DB_Entry,
+        DB_LoadableResource,
+        DB_CreditCard,
+        DB_Note,
+        DB_Passkey,
+        UUID,
+        DB_Tag
+        >
+    ) {
         self.isEncrypted = false
         self.dataStructure = dataStructure
         self.db = nil
@@ -46,7 +70,7 @@ internal struct DatabaseContentCounter {
         return count
     }
     
-    private func getEntriesCountInFolder(_ folder : EncryptedFolder) -> Int {
+    private func getEntriesCountInFolder(_ folder : Encrypted_DB_Folder) -> Int {
         var count = folder.entries.count
         for folder in folder.folders {
             count += getEntriesCountInFolder(folder)
@@ -54,7 +78,7 @@ internal struct DatabaseContentCounter {
         return count
     }
     
-    private func getEntriesCountInFolder(_ folder : Folder) -> Int {
+    private func getEntriesCountInFolder(_ folder : DB_Folder) -> Int {
         var count = folder.entries.count
         for folder in folder.folders {
             count += getEntriesCountInFolder(folder)
@@ -81,7 +105,7 @@ internal struct DatabaseContentCounter {
         return count
     }
     
-    private func getFoldersCountInFolder(_ folder : EncryptedFolder) -> Int {
+    private func getFoldersCountInFolder(_ folder : Encrypted_DB_Folder) -> Int {
         var count = folder.folders.count
         for folder in folder.folders {
             count += getFoldersCountInFolder(folder)
@@ -89,7 +113,7 @@ internal struct DatabaseContentCounter {
         return count
     }
     
-    private func getFoldersCountInFolder(_ folder : Folder) -> Int {
+    private func getFoldersCountInFolder(_ folder : DB_Folder) -> Int {
         var count = folder.folders.count
         for folder in folder.folders {
             count += getFoldersCountInFolder(folder)
@@ -116,7 +140,7 @@ internal struct DatabaseContentCounter {
         return count
     }
     
-    private func getDocumentsCountInFolder(_ folder : EncryptedFolder) -> Int {
+    private func getDocumentsCountInFolder(_ folder : Encrypted_DB_Folder) -> Int {
         var count = folder.documents.count
         for folder in folder.folders {
             count += getDocumentsCountInFolder(folder)
@@ -124,7 +148,7 @@ internal struct DatabaseContentCounter {
         return count
     }
     
-    private func getDocumentsCountInFolder(_ folder : Folder) -> Int {
+    private func getDocumentsCountInFolder(_ folder : DB_Folder) -> Int {
         var count = folder.documents.count
         for folder in folder.folders {
             count += getDocumentsCountInFolder(folder)
@@ -151,7 +175,7 @@ internal struct DatabaseContentCounter {
         return count
     }
     
-    private func getImagesCountInFolder(_ folder : EncryptedFolder) -> Int {
+    private func getImagesCountInFolder(_ folder : Encrypted_DB_Folder) -> Int {
         var count = folder.images.count
         for folder in folder.folders {
             count += getImagesCountInFolder(folder)
@@ -159,7 +183,7 @@ internal struct DatabaseContentCounter {
         return count
     }
     
-    private func getImagesCountInFolder(_ folder : Folder) -> Int {
+    private func getImagesCountInFolder(_ folder : DB_Folder) -> Int {
         var count = folder.images.count
         for folder in folder.folders {
             count += getImagesCountInFolder(folder)

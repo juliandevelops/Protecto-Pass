@@ -9,56 +9,82 @@
 
 import CryptoKit
 import SwiftUI
+import UniformTypeIdentifiers
 
 /// The Overview Screen of the creation process
 /// displaying all your Data and providing further
 /// configuration options
 internal struct AddDB_Overview: View {
-    
+
     /// The View Context to interact with the CoreData System
     @Environment(\.managedObjectContext) private var viewContext
-    
+
     /// The Creation wrapper for this process
     @EnvironmentObject private var creationWrapper : DB_CreationWrapper
-    
+
     /// The Controller for the Navigation
     @EnvironmentObject private var navigationController : AddDB_Navigation
-    
+
     /// The Encryption Algorithm to encrypt the Database
     @State private var encryption : Cryptography.Encryption = .AES256
-    
+
     /// The Type of Storage used to store this Database
     @State private var storage : Storage.StorageType = .CoreData
 
     // TODO: make iterations and key length user custom
-    @State private var iterations : Int64 = 500000
+    /// The iterations used for the key derivation process
+    @State private var iterations : UInt32 = 1
 
-    @State private var keyLength : Int32 = 32
+    /// The length of the database key
+    @State private var keyLength : UInt32 = 32
 
     /// Whether the password is shown or not
     @State private var passwordShown : Bool = false
-    
+
     /// When set to true, displays an alert with an Error Message, because
     /// something went wrong when saving the Database
     @State private var errSavingPresented : Bool = false
 
+    /// The path of this database, if it is stored in the system
     @State private var path : URL? = nil
 
+    /// Whether the file selector is shown
     @State private var selectorPresented : Bool = false
-    
+
+    /// Buffer to store the plaintext password in, if required
+    @State private var plaintextPassword : String = ""
+
+    /// Whether to allow biometrics or not
+    @State private var allowBiometrics : Bool = false
+
     var body: some View {
         List {
             Section("General Data") {
                 ListTile(name: "Name", data: creationWrapper.name)
-                ListTile(name: "Description", data: creationWrapper.description.isEmpty ? "No Description provided" : creationWrapper.description)
+                ListTile(name: "Description", data: creationWrapper.details.isEmpty ? "No Description provided" : creationWrapper.details)
             }
             Section {
                 ListTile(
                     name: "Password",
-                    data: passwordShown ? creationWrapper.password : PasswordGenerator.generateFakePassword(count: creationWrapper.password.count),
+                    data: passwordShown ? plaintextPassword : PasswordGenerator
+                        .generateFakePassword(count: 20), // TODO: change hardcoded fake password count
                     // Not really needed, still entered to tell the System whats going on
                     textContentType: .password
                 ) {
+                    if (passwordShown == false) {
+                        creationWrapper.password!.withUnsafeBytes {
+                            buffer in
+                            plaintextPassword = DataConverter.dataToString(
+                                Data(
+                                    bytesNoCopy: UnsafeMutableRawPointer(mutating: buffer.baseAddress!),
+                                    count: buffer.count,
+                                    deallocator: .none
+                                )
+                            )
+                        }
+                    } else {
+                        plaintextPassword = "" // Clear plaintext password
+                    }
                     withAnimation {
                         passwordShown.toggle()
                     }
@@ -75,12 +101,12 @@ internal struct AddDB_Overview: View {
                         Text(e.rawValue)
                     }
                 }
-//                Picker("Storage", selection: $storage.animation()) {
-//                    ForEach(Storage.StorageType.allCases) {
-//                        s in
-//                        Text(s.rawValue)
-//                    }
-//                }
+                //                Picker("Storage", selection: $storage.animation()) {
+                //                    ForEach(Storage.StorageType.allCases) {
+                //                        s in
+                //                        Text(s.rawValue)
+                //                    }
+                //                }
                 if storage == .File {
                     Button {
                         selectorPresented.toggle()
@@ -100,7 +126,7 @@ internal struct AddDB_Overview: View {
             }
         }
         .alert("Error Saving", isPresented: $errSavingPresented) {
-            
+
         } message: {
             Text("An error occurred while saving the Database, please try again.")
         }
@@ -116,53 +142,58 @@ internal struct AddDB_Overview: View {
             }
         }
     }
-    
+
     /// Function executed when the User pressed the Done Button
     /// This Methods creates a Database and generates all the data
     /// that isn't entered by the User
     private func done() -> Void {
-        // TODO: these three lines as well as the data in the creation Wrapper may be pointless
+        // These three lines as well as the data in the creation Wrapper may be pointless
         // They are still entered, in case the creation process will expand one day
         creationWrapper.encryption = encryption
         creationWrapper.storageType = storage
         creationWrapper.path = path
-        let salt = PasswordGenerator.generateSalt()
         do {
-            navigationController.db = Database(
-                name: creationWrapper.name,
-                description: creationWrapper.description,
+            let salt : Data = try PasswordGenerator.generateSalt()
+            let newDatabase = Database(
+                decryptedName: creationWrapper.name,
+                decryptedDetails: creationWrapper.details,
                 folders: [],
                 entries: [],
                 images: [],
                 videos: [],
-                iconName: creationWrapper.iconName,
+                creditCards: [],
+                notes: [],
+                passkeys: [],
+                decryptedIconName: creationWrapper.iconName,
                 documents: [],
-                created: Date.now,
-                lastEdited: Date.now,
+                decryptedCreatedDate: Date.now,
+                decryptedLastEditedDate: Date.now,
+                decryptedLastAccessedDate: Date.now,
                 header: DB_Header(
-                    encryption: creationWrapper.encryption,
-                    storageType: creationWrapper.storageType,
+                    allowBiometrics: allowBiometrics,
+                    biometricsTimeout: 10000, // TODO: change biometrics timeout from hardcoded value to custom value
+                    encryption: encryption,
+                    storageType: storage,
                     salt: salt,
-                    iterationsCount: iterations,
-                    keyLength: keyLength,
-                    path: creationWrapper.path
+                    // TODO: add parameters
+                    keyParams: DB_HeaderKeyParameters(
+                        iterationsCount: iterations,
+                        keyLength: keyLength,
+                        memoryLimit: 16000,
+                        laneCount: 1,
+                        threadCount: 1,
+                        argon2idVerson: 13
+                    ),
+                    key: Data(), // TODO: add encrypted masterkey
+                    version: DatabaseVersioningScheme.CURRENT_APP_DB_VERSION
                 ),
-                key: PasswordGenerator.generateKey(),
-                derivedKey: try PasswordGenerator.deriveKey(
-                    password: creationWrapper.password,
-                    salt: salt,
-                    iterationsCount: iterations,
-                    keyLength: UInt32(keyLength)
-                ),
-                // TODO: change
-                allowBiometrics: true,
-                id: UUID()
+                decryptedId: UUID()
             )
-        } catch {
-            errSavingPresented.toggle()
-        }
-        do {
-            try Storage.storeDatabase(navigationController.db!, context: viewContext, superID: navigationController.db!.id)
+            navigationController.vaultSession = try VaultSession(
+                userPassword: creationWrapper.password!,
+                newDatabase: newDatabase
+            )
+            try navigationController.vaultSession!.store(context: viewContext)
             navigationController.openDatabaseToHome.toggle()
         } catch {
             errSavingPresented.toggle()
@@ -171,10 +202,10 @@ internal struct AddDB_Overview: View {
 }
 
 internal struct AddDB_Overview_Previews: PreviewProvider {
-    
+
     /// The Wrapper for this preview
     @StateObject private static var creationWrapperPreview : DB_CreationWrapper = DB_CreationWrapper()
-    
+
     static var previews: some View {
         AddDB_Overview()
             .environmentObject(creationWrapperPreview)

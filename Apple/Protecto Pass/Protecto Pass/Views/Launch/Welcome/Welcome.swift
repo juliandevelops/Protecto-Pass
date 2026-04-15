@@ -14,9 +14,11 @@ import SwiftUI
 /// The View that is shown to the User as soon as
 /// he opens the App
 internal struct Welcome: View {
-    
+
+    /// Whether this view shall be displayed in compact mode
     @Environment(\.compactMode) private var compactMode
-    
+
+    /// The context to interact with Core Data
     @Environment(\.managedObjectContext) private var context
     
     /// The Object to control the navigation of and with the AddDB Sheet
@@ -36,20 +38,27 @@ internal struct Welcome: View {
     /// The Database, stored as file, selected by the User
     /// on the File System
     @State private var dbFromPath : EncryptedDatabase?
-    
+
+    /// The Database that shall be unlocked.
+    ///
+    /// The initial value is the encrypted Database so this value cannot be nil which is required
+    /// as the UnlockDB view loads while the database may be selected
     @State private var dbToUnlock : EncryptedDatabase = EncryptedDatabase.previewDB
-    
+
+    /// Control variable used to display an error when reading a database from a provided path failed
     @State private var errReadingDatabaseFromPathShown : Bool = false
-    
+
+    /// Control. variable used to display an error when the deletion of a database failed
     @State private var errDeletingDatabaseShown : Bool = false
-    
+
+    /// Control variable whether to show the confirmation dialog to delete a database
     @State private var deleteDatabaseShown : Bool = false
     
     var body: some View {
         NavigationStack {
             build()
                 .sheet(isPresented: $unlockDBShown) {
-                    UnlockDB(db: $dbToUnlock)
+                    UnlockDB(encryptedDatabase: $dbToUnlock)
                         .environmentObject(navigationSheet)
                 }
                 .sheet(isPresented: $navigationSheet.databaseAddingSheetShown) {
@@ -85,7 +94,10 @@ internal struct Welcome: View {
                 .navigationBarTitleDisplayMode(.automatic)
         }
     }
-    
+
+    /// The build method for this view
+    ///
+    /// - Returns: the main view for this page
     @ViewBuilder
     private func build() -> some View {
         if !databases.isEmpty {
@@ -143,7 +155,13 @@ internal struct Welcome: View {
         }
     }
     
-    /// Returns the Container for the Database
+    /// Builds a container for the provided database
+    ///
+    /// - Parameters
+    ///     - db: The encrypted database to build the container for
+    ///     - width: the width for this container
+    ///
+    /// - Returns: the rendered view
     @ViewBuilder
     private func container(for db : EncryptedDatabase, width : CGFloat) -> some View {
         Button {
@@ -154,7 +172,7 @@ internal struct Welcome: View {
                 Image(systemName: db.iconName)
                 Text(db.name)
                     .font(.headline)
-                Text(db.description)
+                Text(db.details)
                     .font(.subheadline)
                     .lineLimit(2, reservesSpace: true)
             }
@@ -196,6 +214,8 @@ internal struct Welcome: View {
     }
 }
 
+/// Preview Provider for an empty welcome view.
+/// This previews a view with no databases in the app.
 internal struct EmptyWelcome_Previews: PreviewProvider {
     static var previews: some View {
         Welcome(
@@ -206,6 +226,7 @@ internal struct EmptyWelcome_Previews: PreviewProvider {
     }
 }
 
+/// Preview provider with databases added.
 internal struct FilledWelcome_Previews: PreviewProvider {
     static var previews: some View {
         Welcome(
@@ -218,6 +239,7 @@ internal struct FilledWelcome_Previews: PreviewProvider {
     }
 }
 
+/// Preview provider without any databases and the compact Mode activated
 internal struct EmptyWelcomeCompact_Previews: PreviewProvider {
     static var previews: some View {
         Welcome(
@@ -228,6 +250,7 @@ internal struct EmptyWelcomeCompact_Previews: PreviewProvider {
     }
 }
 
+/// Preview provider with databases added and the compact mode active
 internal struct FilledWelcomeCompact_Previews: PreviewProvider {
     static var previews: some View {
         Welcome(

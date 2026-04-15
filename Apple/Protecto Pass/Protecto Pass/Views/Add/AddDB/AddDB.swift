@@ -19,9 +19,9 @@ internal struct AddDB: View {
     /// The Databases Name
     @State private var name : String = ""
     
-    /// The Databases Description
-    @State private var description : String = ""
-    
+    /// More details about the database
+    @State private var details : String = ""
+
     /// When set to true, navigate to the next screen
     @State private var next : Bool = false
     
@@ -59,7 +59,7 @@ internal struct AddDB: View {
                     } message: {
                         Text("A Name for the Database is required.\nPlease enter one")
                     }
-                    TextField("Description", text: $description, axis: .vertical)
+                    TextField("Details", text: $details, axis: .vertical)
                         .lineLimit(3...5)
                         .keyboardType(.asciiCapable)
 
@@ -75,7 +75,7 @@ internal struct AddDB: View {
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel", role: .cancel) {
-                        dismiss()
+                        abort()
                     }
                 }
                 ToolbarItem(placement: .confirmationAction) {
@@ -90,16 +90,28 @@ internal struct AddDB: View {
             }
         }
     }
-    
+
+    /// function to complete this part of the database creation.
+    /// Call this to navigate to the next screen.
+    /// Before navigation, the parameters are stored into the creation wrapper variables to contain
+    /// them until actual finisihing the creation of the database.
     private func done() -> Void {
         guard !name.isEmpty else {
             errEmptyName.toggle()
             return
         }
         creationWrapper.name = name
-        creationWrapper.description = description
+        creationWrapper.details = details
         creationWrapper.iconName = iconName
         next.toggle()
+    }
+
+    /// Call this function to abort the creation process.
+    /// All data are removed from the creation wrapper
+    /// and the sheet is closed.
+    private func abort() -> Void {
+        creationWrapper.clear()
+        dismiss()
     }
 }
 

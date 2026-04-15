@@ -13,31 +13,52 @@ internal struct ME_ContentView : View {
     /* ENVIRONMENT VARIABLES */
     
     @Environment(\.managedObjectContext) private var context
-    
+
     /// Whether the User activated the large Screen preference or not
     @Environment(\.largeScreen) private var largeScreen : Bool
     
     // Environment Objects
-    
-    /// Controls the navigation flow, only necessary if this represents a Database
-    @EnvironmentObject private var navigationController : AddDB_Navigation
-    
+    @EnvironmentObject private var vaultSession : VaultSession
+
     /// The Database used to store the complete Database Object itself when data is added to it
     @EnvironmentObject private var db : Database
     
     
-    internal init(_ dataStructure : ME_DataStructure<String, Date, Folder, Entry, LoadableResource>) {
+    internal init(_ dataStructure :  DB_ME_DataStructure<
+                  String,
+                  Date,
+                  DB_Folder,
+                  DB_Entry,
+                  DB_LoadableResource,
+                  DB_CreditCard,
+                  DB_Note,
+                  DB_Passkey,
+                  UUID,
+                  DB_Tag
+                  >
+    ) {
         self.dataStructure = dataStructure
     }
     
     /// The Data Structure which is displayed in this View
-    @State private var dataStructure : ME_DataStructure<String, Date, Folder, Entry, LoadableResource>
-    
+    @State private var dataStructure :  DB_ME_DataStructure<
+        String,
+        Date,
+        DB_Folder,
+        DB_Entry,
+        DB_LoadableResource,
+        DB_CreditCard,
+        DB_Note,
+        DB_Passkey,
+        UUID,
+        DB_Tag
+    >
+
     /* SELECTED OBJECT VARIABLES */
     
     /// The entry selected to present details to
-    @State private var selectedEntry : Entry?
-    
+    @State private var selectedEntry : DB_Entry?
+
     
     /* SHEET CONTROL VARIABLES */
     // Adding
@@ -74,9 +95,11 @@ internal struct ME_ContentView : View {
     @State private var errSavingPresented : Bool = false
     
     // Deleting
-    
+
+    /// Whether to delete an entry or not
     @State private var entryDelete : Bool = false
-    
+
+    /// Whether to delete a folder or not
     @State private var folderDelete : Bool = false
 
     
@@ -99,9 +122,14 @@ internal struct ME_ContentView : View {
                     entryDetailsPresented: $entryDetailsPresented,
                     entryDelete: $entryDelete
                 )
-                    .environmentObject(db)
-//                ME_ContentViewFolderSection(dataStructure: dataStructure, folderDelete: $folderDelete)
-//                    .environmentObject(db)
+                .environmentObject(vaultSession)
+                ME_ContentViewFolderSection(
+                    dataStructure: dataStructure,
+                    folderDelete: $folderDelete
+                )
+                .environmentObject(vaultSession)
+                // Not implemented in current version
+                // TODO: migration to vaultSession instead of database still has to be done in the following sections
 //                ME_ContentViewImageSection(
 //                    dataStructure: dataStructure,
 //                    metrics: metrics,
@@ -109,13 +137,11 @@ internal struct ME_ContentView : View {
 //                    audioVisualItemsToAdd: $audioVisualItemsSelected,
 //                    addImagePresented: $addImagePresented
 //                )
-//                .environmentObject(db)
-                ME_ContentViewDocumentSection(
-                    dataStructure: dataStructure,
-                    errSavingPresented: $errSavingPresented,
-                    addDocPresented: $addDocPresented
-                )
-                .environmentObject(db)
+//                ME_ContentViewDocumentSection(
+//                    dataStructure: dataStructure,
+//                    errSavingPresented: $errSavingPresented,
+//                    addDocPresented: $addDocPresented
+//                )
             }
         }
         // Shows "Home" when the Data Structure is a Database, otherwise shows the title of the data structure. While the data structure is nil, such as while the app is loading, it showns "Loading..."
@@ -127,10 +153,7 @@ internal struct ME_ContentView : View {
             if dataStructure is Database {
                 ToolbarItem(placement: .cancellationAction) {
                     Button {
-                        navigationController.db = nil
-                        withAnimation {
-                            navigationController.openDatabaseToHome.toggle()
-                        }
+                        // TODO: lock database -> zero out and delete all local data as far as possible => go to welcome view
                     } label: {
                         Image(systemName: "lock")
                     }
@@ -170,7 +193,7 @@ internal struct ME_ContentView : View {
                     } label: {
                         Label("Edit", systemImage: "pencil")
                     }
-                    if dataStructure is Folder {
+                    if dataStructure is DB_Folder {
                         Divider()
                         Button(role: .destructive) {
                             // TODO: deleting folder from here does nothing
@@ -217,6 +240,7 @@ internal struct ME_ContentView : View {
 }
 
 
+/// Preview
 internal struct ME_ContentView_Previews: PreviewProvider {
     
     @StateObject private static var db : Database = Database.previewDB

@@ -19,8 +19,9 @@ internal struct ImageInfo: View {
                 ListTile(name: "Quality", data: String(image!.quality))
             }
             Section("Timeline") {
-                ListTile(name: "Created", date: image!.created)
-                ListTile(name: "Last edited", date: image!.lastEdited)
+                ListTile(name: "Created", date: image!.createdDate)
+                ListTile(name: "Last edited", date: image!.lastEditedDate)
+                ListTile(name: "Last accessed", date: image!.lastAccessedDate)
             }
         }
         .navigationTitle("Details")

@@ -7,9 +7,9 @@
 
 import Foundation
 
-internal class DB_GeneralLoadableResource<N> {
+internal class DB_GeneralLoadableResource<NameType> {
 
-    internal init(id: UUID, name: N?, thumbnailData: Data) {
+    internal init(id: UUID, name: NameType?, thumbnailData: Data) {
         self.id = id
         self.name = name
         self.thumbnailData = thumbnailData
@@ -21,8 +21,8 @@ internal class DB_GeneralLoadableResource<N> {
     
     internal let id : UUID
     
-    internal let name : N?
-    
+    internal let name : NameType?
+
     internal let thumbnailData : Data
 }
 
@@ -31,6 +31,12 @@ internal final class DB_LoadableResource : DB_GeneralLoadableResource<String>, D
         return lhs.id == rhs.id &&
         lhs.name == rhs.name &&
         lhs.thumbnailData == rhs.thumbnailData
+    }
+
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
+        hasher.combine(name)
+        hasher.combine(thumbnailData)
     }
 }
 
@@ -47,14 +53,6 @@ internal final class Encrypted_DB_LoadableResource : DB_GeneralLoadableResource<
         try container.encode(id, forKey: .id)
         try container.encode(name, forKey: .name)
         try container.encode(thumbnailData, forKey: .thumbnailData)
-    }
-    
-    internal override init(id: UUID, name: Data?, thumbnailData: Data) {
-        super.init(
-            id: id,
-            name: name,
-            thumbnailData: thumbnailData
-        )
     }
     
     internal convenience init(from decoder: any Decoder) throws {

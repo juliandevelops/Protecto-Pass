@@ -10,6 +10,8 @@
 import CoreData
 import Foundation
 
+// TODO: convert notes and tags as well
+
 /// Protocol all converters in this File must conform to
 private protocol DatabaseConverterProtocol {
     
@@ -23,7 +25,7 @@ private protocol DatabaseConverterProtocol {
     static func fromCD(_ coreData : CoreData) throws -> Encrypted
     
     /// Converts the specified encrypted Object to a core Data Object
-    static func toCD(_ encrypted : Encrypted, context : NSManagedObjectContext) -> CoreData
+    static func toCD(_ encrypted : Encrypted, context : NSManagedObjectContext) throws -> CoreData
 }
 
 /// Converts the stored Databases (e.g. Core Data) into
@@ -43,10 +45,10 @@ internal struct DB_Converter : DatabaseConverterProtocol {
         return result
     }
     
-    internal static func toCD(_ encrypted: EncryptedDatabase, context: NSManagedObjectContext) -> CD_Database {
+    internal static func toCD(_ encrypted: EncryptedDatabase, context: NSManagedObjectContext) throws -> CD_Database {
         let cdDB : CD_Database = CD_Database(context: context)
         cdDB.name = DataConverter.stringToData(encrypted.name)
-        cdDB.dataDescription = DataConverter.stringToData(encrypted.description)
+        cdDB.details = DataConverter.stringToData(encrypted.details)
         for folder in encrypted.folders {
             cdDB.addToFolders(FolderConverter.toCD(folder, context: context))
         }
@@ -63,10 +65,10 @@ internal struct DB_Converter : DatabaseConverterProtocol {
             cdDB.addToDocuments(LoadableResourceConverter.toCD(document, context: context))
         }
         cdDB.iconName = DataConverter.stringToData(encrypted.iconName)
-        cdDB.created = DataConverter.dateToData(encrypted.created)
-        cdDB.lastEdited = DataConverter.dateToData(encrypted.lastEdited)
-        cdDB.header = HeaderConverter.toCD(encrypted.header, context: context)
-        cdDB.uuid = encrypted.id
+        cdDB.createdDate = DataConverter.dateToData(encrypted.createdDate)
+        cdDB.lastEditedDate = DataConverter.dateToData(encrypted.lastEditedDate)
+        cdDB.header = try HeaderConverter.toCD(encrypted.header, context: context)
+        cdDB.uuid = DataConverter.uuidToData(encrypted.id)
         return cdDB
     }
 }
@@ -74,14 +76,14 @@ internal struct DB_Converter : DatabaseConverterProtocol {
 /// Struct to convert Folders from encrypted to Core Data and backwards
 private struct FolderConverter : DatabaseConverterProtocol {
     
-    fileprivate static func fromCD(_ coreData: CD_Folder) -> EncryptedFolder {
-        return EncryptedFolder(from: coreData)
+    fileprivate static func fromCD(_ coreData: CD_Folder) throws -> Encrypted_DB_Folder {
+        return try Encrypted_DB_Folder(from: coreData)
     }
     
-    fileprivate static func toCD(_ encrypted: EncryptedFolder, context: NSManagedObjectContext) -> CD_Folder {
+    fileprivate static func toCD(_ encrypted: Encrypted_DB_Folder, context: NSManagedObjectContext) -> CD_Folder {
         let cdFolder : CD_Folder = CD_Folder(context: context)
         cdFolder.name = encrypted.name
-        cdFolder.dataDescription = encrypted.description
+        cdFolder.details = encrypted.details
         for f in encrypted.folders {
             cdFolder.addToFolders(toCD(f, context: context))
         }
@@ -101,8 +103,8 @@ private struct FolderConverter : DatabaseConverterProtocol {
         for doc in encrypted.documents {
             cdFolder.addToDocuments(LoadableResourceConverter.toCD(doc, context: context))
         }
-        cdFolder.created = encrypted.created
-        cdFolder.lastEdited = encrypted.lastEdited
+        cdFolder.createdDate = encrypted.createdDate
+        cdFolder.lastEditedDate = encrypted.lastEditedDate
         cdFolder.uuid = encrypted.id
         return cdFolder
     }
@@ -111,23 +113,22 @@ private struct FolderConverter : DatabaseConverterProtocol {
 /// Struct to convert Entries from encrypted to Core Data and backwards
 private struct EntryConverter : DatabaseConverterProtocol {
     
-    fileprivate static func fromCD(_ coreData: CD_Entry) -> EncryptedEntry {
-        return EncryptedEntry(from: coreData)
+    fileprivate static func fromCD(_ coreData: CD_Entry) throws -> Encrypted_DB_Entry {
+        return try Encrypted_DB_Entry(from: coreData)
     }
     
-    fileprivate static func toCD(_ encrypted: EncryptedEntry, context: NSManagedObjectContext) -> CD_Entry {
+    fileprivate static func toCD(_ encrypted: Encrypted_DB_Entry, context: NSManagedObjectContext) -> CD_Entry {
         let cdEntry : CD_Entry = CD_Entry(context: context)
         cdEntry.title = encrypted.title
-        cdEntry.username = encrypted.username
-        cdEntry.password = encrypted.password
+        cdEntry.username = encrypted.encryptedUsername
+        cdEntry.password = encrypted.encryptedPassword
         cdEntry.url = encrypted.url
-        cdEntry.notes = encrypted.notes
         cdEntry.iconName = encrypted.iconName
         for doc in encrypted.documents {
             cdEntry.addToDocuments(LoadableResourceConverter.toCD(doc, context: context))
         }
-        cdEntry.created = encrypted.created
-        cdEntry.lastEdited = encrypted.lastEdited
+        cdEntry.createdDate = encrypted.createdDate
+        cdEntry.lastEditedDate = encrypted.lastEditedDate
         cdEntry.uuid = encrypted.id
         return cdEntry
     }
@@ -136,31 +137,31 @@ private struct EntryConverter : DatabaseConverterProtocol {
 /// Struct to convert Images from encrypted to Core Data and backwards
 internal struct ImageConverter : DatabaseConverterProtocol {
     internal static func fromCD(_ coreData: CD_Image) throws -> Encrypted_DB_Image {
-        return Encrypted_DB_Image(from: coreData)
+        return try Encrypted_DB_Image(from: coreData)
     }
     
     internal static func toCD(_ encrypted: Encrypted_DB_Image, context: NSManagedObjectContext) -> CD_Image {
         let cdImage : CD_Image = CD_Image(context: context)
         cdImage.imageData = encrypted.image
         cdImage.compressionQuality = encrypted.quality
-        cdImage.created = encrypted.created
-        cdImage.lastEdited = encrypted.lastEdited
-        cdImage.uuid = encrypted.id
+        cdImage.createdDate = encrypted.createdDate
+        cdImage.lastEditedDate = encrypted.lastEditedDate
+        cdImage.uuid = DataConverter.uuidToData(encrypted.id)
         return cdImage
     }
 }
 
 internal struct VideoConterter : DatabaseConverterProtocol {
     static func fromCD(_ coreData: CD_Video) throws -> Encrypted_DB_Video {
-        return Encrypted_DB_Video(from: coreData)
+        return try Encrypted_DB_Video(from: coreData)
     }
     
     static func toCD(_ encrypted: Encrypted_DB_Video, context: NSManagedObjectContext) -> CD_Video {
         let cdVideo : CD_Video = CD_Video(context: context)
-        cdVideo.videoData = encrypted.video
-        cdVideo.created = encrypted.created
-        cdVideo.lastEdited = encrypted.lastEdited
-        cdVideo.uuid = encrypted.id
+        cdVideo.videoData = encrypted.videoData
+        cdVideo.createdDate = encrypted.createdDate
+        cdVideo.lastEditedDate = encrypted.lastEditedDate
+        cdVideo.uuid = DataConverter.uuidToData(encrypted.id)
         return cdVideo
     }
 }
@@ -168,7 +169,7 @@ internal struct VideoConterter : DatabaseConverterProtocol {
 /// Struct to convert Documents from encrypted to Core Data and backwards
 internal struct DocumentConverter : DatabaseConverterProtocol {
     internal static func fromCD(_ coreData: CD_Document) throws -> Encrypted_DB_Document {
-        return Encrypted_DB_Document(from: coreData)
+        return try Encrypted_DB_Document(from: coreData)
     }
     
     internal static func toCD(_ encrypted: Encrypted_DB_Document, context: NSManagedObjectContext) -> CD_Document {
@@ -176,19 +177,19 @@ internal struct DocumentConverter : DatabaseConverterProtocol {
         cdDoc.documentData = encrypted.document
         cdDoc.type = encrypted.type
         cdDoc.name = encrypted.name
-        cdDoc.created = encrypted.created
-        cdDoc.lastEdited = encrypted.lastEdited
-        cdDoc.uuid = encrypted.id
+        cdDoc.createdDate = encrypted.createdDate
+        cdDoc.lastEditedDate = encrypted.lastEditedDate
+        cdDoc.uuid = DataConverter.uuidToData(encrypted.id)
         return cdDoc
     }
 }
 
 private struct LoadableResourceConverter : DatabaseConverterProtocol {
-    internal static func fromCD(_ coreData: CD_LoadableResource) throws -> EncryptedLoadableResource {
-        return EncryptedLoadableResource(from: coreData)
+    internal static func fromCD(_ coreData: CD_LoadableResource) throws -> Encrypted_DB_LoadableResource {
+        return Encrypted_DB_LoadableResource(from: coreData)
     }
     
-    internal static func toCD(_ encrypted: EncryptedLoadableResource, context: NSManagedObjectContext) -> CD_LoadableResource {
+    internal static func toCD(_ encrypted: Encrypted_DB_LoadableResource, context: NSManagedObjectContext) -> CD_LoadableResource {
         let cdLR : CD_LoadableResource = CD_LoadableResource(context: context)
         cdLR.uuid = encrypted.id
         cdLR.name = encrypted.name
@@ -201,21 +202,27 @@ private struct LoadableResourceConverter : DatabaseConverterProtocol {
 /// NOTE: Encrypted is not encrypted here due to the header never being encrypted
 private struct HeaderConverter : DatabaseConverterProtocol {
     internal static func fromCD(_ coreData: CD_DB_Header) throws -> DB_Header {
-        return DB_Header(from: coreData)
+        return try DB_Header(from: coreData)
     }
 
-    internal static func toCD(_ encrypted: DB_Header, context: NSManagedObjectContext) -> CD_DB_Header {
+    internal static func toCD(_ encrypted: DB_Header, context: NSManagedObjectContext) throws -> CD_DB_Header {
         let cdHeader = CD_DB_Header(context: context)
         cdHeader.allowBiometrics = encrypted.allowBiometrics
         cdHeader.biometricsTimeout = encrypted.biometricsTimeout
         cdHeader.encryption = encrypted.encryption.rawValue
         cdHeader.storageType = encrypted.storageType.rawValue
         cdHeader.salt = encrypted.salt
-        cdHeader.iterationsCount = encrypted.iterationsCount
-        cdHeader.keyLength = encrypted.keyLength
+        cdHeader.keyParams = CD_DB_HeaderKeyParameters(context: context)
+        guard cdHeader.keyParams != nil else {
+            throw DatabaseError.conversionError
+        }
+        cdHeader.keyParams!.iterationsCount = Int64(encrypted.keyParameters.iterationsCount)
+        cdHeader.keyParams!.keyLength = Int64(encrypted.keyParameters.keyLength)
+        cdHeader.keyParams!.laneCount = Int64(encrypted.keyParameters.laneCount)
+        cdHeader.keyParams!.memoryLimit = Int64(encrypted.keyParameters.memoryLimit)
         cdHeader.key = encrypted.key
         cdHeader.path = encrypted.path
-        cdHeader.version = encrypted.version
+        cdHeader.version = encrypted.version.coreDataCompositiveTypeRepresentation
         return cdHeader
     }
 }

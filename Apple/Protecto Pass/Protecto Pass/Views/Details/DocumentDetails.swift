@@ -25,7 +25,7 @@ internal struct DocumentDetails: View {
     var body: some View {
         NavigationStack {
             Group {
-                if document!.isText() {
+                if document!.isText {
                     ScrollView {
                         if let fString = formattedString {
                             Text(AttributedString(fString))
@@ -34,7 +34,7 @@ internal struct DocumentDetails: View {
                         }
                     }
                     .onAppear {
-                        guard document!.isFormattedText() else { return }
+                        guard document!.isFormattedText else { return }
                         do {
                             if document!.type == "rtf" {
                                 formattedString = try NSAttributedString(
@@ -63,7 +63,7 @@ internal struct DocumentDetails: View {
                             formattedString = nil
                         }
                     }
-                } else if document!.isPDF() {
+                } else if document!.isPDF {
                     PDFDocumentDetailsView(pdfDocument: document)
                 } else {
                     Text("This type of document can't be displayed directly in the App")
@@ -117,7 +117,8 @@ private struct PDFDocumentDetailsView: UIViewRepresentable {
         pdfView.displayMode = .singlePageContinuous
         return pdfView
     }
-    
+
+
     func updateUIView(_ uiView: PDFView, context: Context) {
         uiView.document = PDFDocument(data: pdfDocument!.document)
     }
@@ -130,9 +131,11 @@ internal struct PDFDocumentDetailsPreview : PreviewProvider {
         document: Data(),
         type: "pdf",
         name: "Test Document",
-        created: Date.now,
-        lastEdited: Date.now,
-        id: UUID()
+        createdDate: Date.now,
+        lastEditedDate: Date.now,
+        lastAccessedDate: Date.now,
+        id: UUID(),
+        tags: []
     )
     
     @State private static var delete : Bool = false
@@ -151,9 +154,11 @@ internal struct TextDocumentDetailsPreview : PreviewProvider {
         document: DataConverter.stringToData("Test Data"),
         type: "txt",
         name: "Test Document",
-        created: Date.now,
-        lastEdited: Date.now,
-        id: UUID()
+        createdDate: Date.now,
+        lastEditedDate: Date.now,
+        lastAccessedDate: Date.now,
+        id: UUID(),
+        tags: []
     )
     
     @State private static var delete : Bool = false

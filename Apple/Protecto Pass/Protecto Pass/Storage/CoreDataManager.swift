@@ -62,8 +62,8 @@ internal struct CoreDataManager {
         for imageID in ids {
             let cdImage = try context.fetch(getFetchRequest(forImageID: imageID)).first!
             let im = try ImageConverter.fromCD(cdImage)
-            let decryptedImage = try Decrypter.decryptImage(im, in: db)
-            results.append(decryptedImage)
+//            let decryptedImage = try Decrypter.decryptImage(im)
+//            results.append(decryptedImage)
         }
         return results
     }
@@ -73,8 +73,8 @@ internal struct CoreDataManager {
         for vID in ids {
             let cdVideo = try context.fetch(getFetchRequest(forVideoID: vID)).first!
             let vid = try VideoConterter.fromCD(cdVideo)
-            let decryptedVideo = try Decrypter.decryptVideo(vid, in: db)
-            results.append(decryptedVideo)
+//            let decryptedVideo = try Decrypter.decryptVideo(vid)
+//            results.append(decryptedVideo)
         }
         return results
     }
@@ -84,8 +84,8 @@ internal struct CoreDataManager {
         for dID in ids {
             let cdDocument = try context.fetch(getFetchRequest(forDocumentID: dID)).first!
             let doc = try DocumentConverter.fromCD(cdDocument)
-            let decryptedDocument = try Decrypter.decryptDocument(doc, in: db)
-            results.append(decryptedDocument)
+//            let decryptedDocument = try Decrypter.decryptDocument(doc, in: db)
+//            results.append(decryptedDocument)
         }
         return results
     }
@@ -96,7 +96,7 @@ internal struct CoreDataManager {
             try deleteDatabaseMeta(db.id, with: context)
         }
         // Store Database including folders and entries, loadable Resource references are stored in this too, the actual resources are stored on adding them to the Database
-        let _ = DB_Converter.toCD(db, context: context)
+        let _ = try DB_Converter.toCD(db, context: context)
         try context.save()
     }
     
@@ -117,6 +117,7 @@ internal struct CoreDataManager {
     
     /// Only deletes the Database Meta or Base data, letting images, documents and videos remain
     internal static func deleteDatabaseMeta(_ id : UUID, with context : NSManagedObjectContext) throws -> Void {
+        // TODO: delete database from cache
         let db : CD_Database = try accessCache(id: id, context: context)
         let _ = try DB_Converter.fromCD(db)
         context.delete(try accessCache(id: id, context: context))

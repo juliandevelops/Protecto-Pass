@@ -16,6 +16,6 @@ internal final class AddDB_Navigation : ObservableObject {
     /// Home Menu when unlocking the Database
     @Published internal var openDatabaseToHome : Bool = false
     
-    /// The Databases that is being created with this instance
-    @Published internal var db : Database?
+    /// The current vault session for the unlocked database
+    @Published internal var vaultSession : VaultSession?
 }

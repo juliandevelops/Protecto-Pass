@@ -113,7 +113,11 @@ internal struct AddDB_Password: View {
             errRequirements.toggle()
             return
         }
-        creationWrapper.password = password
+        do {
+            creationWrapper.password = try SecureKeyBytes(copying: DataConverter.stringToData(password), count: password.count)
+        } catch {
+            // TODO: handle error thrown
+        }
         next.toggle()
     }
     
@@ -164,7 +168,7 @@ internal struct AddDB_PasswordVerification : View {
     
     /// The verification password
     @State private var verifyPassword : String = ""
-    
+
     /// When set to true, presents an alert stating that the passwords are different
     @State private var errDifferent : Bool = false
     
@@ -243,10 +247,15 @@ internal struct AddDB_PasswordVerification : View {
     
     /// Function to check if both Passwords are equal
     private func checkEqual() -> Void {
-        if creationWrapper.password == verifyPassword {
-            equal = true
-        } else {
-            equal = false
+        guard creationWrapper.password != nil else { return }
+        do {
+            if try creationWrapper.password!.compareWithString(verifyPassword) {
+                equal = true
+            } else {
+                equal = false
+            }
+        } catch {
+            // TODO: handle error thrown in password comparison
         }
     }
 }

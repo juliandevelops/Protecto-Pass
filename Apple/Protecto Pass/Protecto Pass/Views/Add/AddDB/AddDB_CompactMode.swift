@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import UniformTypeIdentifiers
 
 internal struct AddDB_CompactMode: View {
 
@@ -20,9 +21,12 @@ internal struct AddDB_CompactMode: View {
     @State private var name : String = ""
 
     /// Description for the Database
-    @State private var description : String = ""
+    @State private var details : String = ""
 
     /// The Password for this Database
+    ///
+    /// This password is stored as string and not as `SecureKeyBytes` because
+    /// it is directly taken from the input textfield and work with directly
     @State private var password : String = ""
 
     /// The Icon Name for this Database
@@ -67,9 +71,9 @@ internal struct AddDB_CompactMode: View {
     @State private var path : URL? = nil
 
     // TODO: make iterations and key length user custom
-    @State private var iterations : Int64 = 500000
+    @State private var iterations : UInt32 = 500000
 
-    @State private var keyLength : Int32 = 32
+    @State private var keyLength : UInt32 = 32
 
     /// Whether the directory selector is presented or not
     @State private var selectorPresented : Bool = false
@@ -83,7 +87,7 @@ internal struct AddDB_CompactMode: View {
                 Section {
                     TextField("Name", text: $name)
                         .keyboardType(.namePhonePad)
-                    TextField("Description", text: $description)
+                    TextField("Description", text: $details)
                         .keyboardType(.asciiCapable)
                 } header: {
                     Text("General")
@@ -224,44 +228,51 @@ internal struct AddDB_CompactMode: View {
             errRequirements.toggle()
             return
         }
-        // TODO: these three lines as well as the data in the creation Wrapper may be pointless
-        // They are still entered, in case the creation process will expand one day
-        let salt = PasswordGenerator.generateSalt()
         do {
-            navigationController.db = Database(
-                name: name,
-                description: description,
+            let salt : Data = try PasswordGenerator.generateSalt()
+            let newDatabase = Database(
+                decryptedName: name,
+                decryptedDetails: details,
                 folders: [],
                 entries: [],
                 images: [],
                 videos: [],
-                iconName: iconName,
+                creditCards: [],
+                notes: [],
+                passkeys: [],
+                decryptedIconName: iconName,
                 documents: [],
-                created: Date.now,
-                lastEdited: Date.now,
+                decryptedCreatedDate: Date.now,
+                decryptedLastEditedDate: Date.now,
+                decryptedLastAccessedDate: Date.now,
                 header: DB_Header(
+                    allowBiometrics: allowBiometrics,
+                    biometricsTimeout: 10000,
+                    // TODO: change biometrics timeout from hardcoded value to custom value
                     encryption: encryption,
                     storageType: storage,
                     salt: salt,
-                    iterationsCount: iterations,
-                    keyLength: keyLength,
-                    path: path
+                    // TODO: add parameters
+                    keyParams: DB_HeaderKeyParameters(
+                        iterationsCount: iterations,
+                        keyLength: keyLength,
+                        memoryLimit: 16000,
+                        laneCount: 1,
+                        threadCount: 1,
+                        argon2idVerson: 13
+                    ),
+                    key: Data(),
+                    // TODO: add encrypted database key
+                    version: DatabaseVersioningScheme.CURRENT_APP_DB_VERSION
                 ),
-                key: PasswordGenerator.generateKey(),
-                derivedKey: try PasswordGenerator.deriveKey(
-                    password: password,
-                    salt: salt,
-                    iterationsCount: iterations,
-                    keyLength: UInt32(keyLength)
-                ),
-                allowBiometrics: allowBiometrics,
-                id: UUID()
+                decryptedId: UUID()
             )
-        } catch {
-            errSavingPresented.toggle()
-        }
-        do {
-            try Storage.storeDatabase(navigationController.db!, context: viewContext, superID: navigationController.db!.id)
+            navigationController.vaultSession = try VaultSession(
+                userPassword: SecureKeyBytes(copying: DataConverter.stringToData(password), count: password.count),
+                newDatabase: newDatabase
+            )
+            // TODO: store database
+            //            try Storage.storeDatabase(navigationController.db!, context: viewContext, superID: navigationController.db!.id)
             navigationController.openDatabaseToHome.toggle()
         } catch {
             errSavingPresented.toggle()

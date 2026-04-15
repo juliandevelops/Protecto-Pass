@@ -10,8 +10,8 @@ import UIKit
 
 internal struct DataConverter {
     
-    // STRING <-> DATA
-    
+    /* STRING <-> DATA */
+
     /// Converts the passed String to Data (Bytes)
     internal static func stringToData(_ string : String) -> Data {
         return string.data(using: .utf8)!
@@ -26,7 +26,7 @@ internal struct DataConverter {
     }
     
     
-    // STRING <-> DATE
+    /* STRING <-> DATE */
 
     /// Converts a String to a Date
     internal static func stringToDate(_ string : String) throws -> Date {
@@ -39,7 +39,7 @@ internal struct DataConverter {
     }
     
     
-    // DATA <-> DATE
+    /* DATA <-> DATE */
 
     /// Converts a Date to Data (Bytes)
     internal static func dateToData(_ date : Date) -> Data {
@@ -52,7 +52,7 @@ internal struct DataConverter {
     }
     
     
-    // IMAGE -> DATA
+    /* IMAGE -> DATA */
 
     /// Converts an Image to Bytes
     internal static func imageToData(_ image : DB_Image) throws -> Data {
@@ -60,7 +60,7 @@ internal struct DataConverter {
     }
     
     
-    // DATA <-> NUMBER
+    /* DATA <-> NUMBER */
 
     /// Converts a Double to Bytes
     internal static func doubleToData(_ double : Double) -> Data {
@@ -70,5 +70,30 @@ internal struct DataConverter {
     /// Converts Bytes (Data) to a Double
     internal static func dataToDouble(_ data : Data) -> Double {
         return Double(dataToString(data))!
+    }
+
+
+
+    /* DATA <-> UUID */
+
+    internal static func dataToUUID(_ data: Data) -> UUID {
+        return UUID(uuidString: dataToString(data))!
+    }
+
+
+    internal static func uuidToData(_ uuid: UUID) -> Data {
+        return stringToData(uuid.uuidString)
+    }
+
+
+    /* DATA <-> INT */
+
+// TODO: update data int converter
+    internal static func dataToInt(_ data: Data) -> Int {
+        return Int(dataToString(data))!
+    }
+
+    internal static func intToData(_ int: Int) -> Data {
+        return stringToData(String(int))
     }
 }

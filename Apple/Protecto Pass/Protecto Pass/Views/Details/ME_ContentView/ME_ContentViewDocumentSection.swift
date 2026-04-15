@@ -6,17 +6,40 @@
 //
 
 import SwiftUI
+import UniformTypeIdentifiers
 
 internal struct ME_ContentViewDocumentSection: View {
     
     @Environment(\.managedObjectContext) private var context
+
+    @EnvironmentObject private var vaultSession : VaultSession
     
-    @EnvironmentObject private var db : Database
-    
-    private var dataStructure : ME_DataStructure<String, Date, Folder, Entry, LoadableResource>
-    
+    private var dataStructure : DB_ME_DataStructure<
+        String,
+        Date,
+        DB_Folder,
+        DB_Entry,
+        DB_LoadableResource,
+        DB_CreditCard,
+        DB_Note,
+        DB_Passkey,
+        UUID,
+        DB_Tag
+    >
+
     internal init(
-        dataStructure: ME_DataStructure<String, Date, Folder, Entry, LoadableResource>,
+        dataStructure: DB_ME_DataStructure<
+            String,
+            Date,
+            DB_Folder,
+            DB_Entry,
+            DB_LoadableResource,
+            DB_CreditCard,
+            DB_Note,
+            DB_Passkey,
+            UUID,
+            DB_Tag
+        >,
         errSavingPresented : Binding<Bool>,
         addDocPresented : Binding<Bool>
     ) {
@@ -52,7 +75,7 @@ internal struct ME_ContentViewDocumentSection: View {
         var documentIDs : [UUID] = []
         dataStructure.documents.forEach({ documentIDs.append($0.id) })
         do {
-            documents = try Storage.loadDocuments(db, ids: documentIDs, context: context)
+            documents = try Storage.loadDocuments(vaultSession.database, ids: documentIDs, context: context)
         } catch {
             errLoadingResourcesShown.toggle()
         }
@@ -86,11 +109,13 @@ internal struct ME_ContentViewDocumentSection: View {
                     }
                     .alert("Delete Document?", isPresented: $documentDeletionConfirmationShown) {
                         Button("Continue", role: .destructive) {
-                            let loadableResource : LoadableResource = dataStructure.documents.first(where: { $0.id == selectedDocument!.id })!
+                            let loadableResource : DB_LoadableResource = dataStructure.documents.first(where: { $0.id == selectedDocument!.id })!
                             do {
                                 documents.removeAll(where: { $0.id == selectedDocument!.id })
                                 dataStructure.documents.removeAll(where: { $0.id == selectedDocument!.id })
-                                try Storage.deleteDocument(id: selectedDocument!.id, in: db, with: context)
+                                try vaultSession.store(context: context)
+//                                try Storage
+//                                    .deleteDocument(id: selectedDocument!.id, in: vaultSession.database, with: context)
                             } catch {
                                 documents.append(selectedDocument!)
                                 dataStructure.documents.append(loadableResource)
@@ -133,7 +158,7 @@ internal struct ME_ContentViewDocumentSection: View {
                         try FileImportHandler.handleDocumentPickerInput(
                             result: result,
                             documents: $documents,
-                            storeIn: db,
+                            storeIn: vaultSession.database,
                             context: context,
                             onSuperID: dataStructure.id
                         )
@@ -150,15 +175,26 @@ internal struct ME_ContentViewDocumentSection: View {
 
 #Preview {
     
-    @Previewable @State var dataStructure : ME_DataStructure<String, Date, Folder, Entry, LoadableResource> = Database.previewDB
-    
+    @Previewable @State var dataStructure : DB_ME_DataStructure<
+        String,
+        Date,
+        DB_Folder,
+        DB_Entry,
+        DB_LoadableResource,
+        DB_CreditCard,
+        DB_Note,
+        DB_Passkey,
+        UUID,
+        DB_Tag
+    > = Database.previewDB
+
     @Previewable @State var errSavingPresented : Bool = false
     
     @Previewable @State var addDocPresented : Bool = false
     
-    ME_ContentViewDocumentSection(
-        dataStructure: dataStructure,
-        errSavingPresented: $errSavingPresented,
-        addDocPresented: $addDocPresented
-    )
+//    ME_ContentViewDocumentSection(
+//        dataStructure: dataStructure,
+//        errSavingPresented: $errSavingPresented,
+//        addDocPresented: $addDocPresented
+//    )
 }

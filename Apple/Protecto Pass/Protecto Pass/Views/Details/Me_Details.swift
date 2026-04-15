@@ -13,8 +13,19 @@ internal struct Me_Details: View {
 
     @Environment(\.dismiss) private var dismiss
     
-    internal let me : ME_DataStructure<String, Date, Folder, Entry, LoadableResource>
-    
+    internal let me : DB_ME_DataStructure<
+        String,
+        Date,
+        DB_Folder,
+        DB_Entry,
+        DB_LoadableResource,
+        DB_CreditCard,
+        DB_Note,
+        DB_Passkey,
+        UUID,
+        DB_Tag
+    >
+
     @State private var dbContentCounter : DatabaseContentCounter?
     
     var body: some View {
@@ -22,12 +33,12 @@ internal struct Me_Details: View {
             List {
                 Section("General") {
                     ListTile(name: "Name", data: me.name)
-                    if me.description.isEmpty {
+                    if me.details.isEmpty {
                         ListTile(name: "Description", data: "No Description provided")
                     } else {
                         Group {
                             Text("Description")
-                            Text(me.description)
+                            Text(me.details)
                                 .foregroundColor(.gray)
                         }
                     }
@@ -49,8 +60,9 @@ internal struct Me_Details: View {
                     Text("These information only contain documents added soley as documents. Attachments to entries are not respected in these information.")
                 }
                 Section("Timeline") {
-                    ListTile(name: "Created", date: me.created)
-                    ListTile(name: "Last edited", date: me.lastEdited)
+                    ListTile(name: "Created", date: me.createdDate)
+                    ListTile(name: "Last edited", date: me.lastEditedDate)
+                    ListTile(name: "Last accessed:", date: me.lastAccessedDate)
                 }
             }
             .onAppear {
@@ -73,6 +85,6 @@ internal struct Me_Details: View {
 
 internal struct ME_Details_Previews: PreviewProvider {
     static var previews: some View {
-        Me_Details(me: Folder.previewFolder)
+        Me_Details(me: DB_Folder.previewFolder)
     }
 }

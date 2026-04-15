@@ -15,12 +15,12 @@ internal struct ImageListDetails: View {
     /// The full database needed to store it
     @EnvironmentObject private var db : Database
     
-    @Binding internal var audioVisualObjects : [LoadableResource]
-    
+    @Binding internal var audioVisualObjects : [DB_LoadableResource]
+
     @State private var imageDetailsPresented : Bool = false
     
-    @State private var selectedObject : LoadableResource?
-    
+    @State private var selectedObject : DB_LoadableResource?
+
     @State private var addImagePresented : Bool = false
     
     @State private var itemsSelected : [PhotosPickerItem] = []
@@ -96,7 +96,7 @@ internal struct ImageListDetails: View {
               // TODO: change to binding(?) and dialog
             .onChange(of: imageDeleted) {
                 do {
-                    try Storage.deleteImage(id: selectedObject!.id, in: db, with: context)
+//                    try Storage.deleteImage(id: selectedObject!.id, in: db, with: context)
                     audioVisualObjects.removeAll(where: { $0.id == selectedObject!.id })
                     selectedObject = nil
                     // TODO: remove loadable resource reference
@@ -127,7 +127,7 @@ internal struct ImageListDetails: View {
 
 internal struct ImageListDetails_Previews: PreviewProvider {
     
-    @State static private var objects : [LoadableResource] = []
+    @State static private var objects : [DB_LoadableResource] = []
     
     @StateObject static private var db : Database = Database.previewDB
     

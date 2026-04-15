@@ -10,28 +10,38 @@ import Combine
 
 /// Superclass of every Native Type implemented in this App, that could not have
 /// been implemented with a default Type
-///
-/// # Params
-/// DE: Date
-/// DA: Icon Name Data
-/// DO: Documents type
-internal class DB_NativeType<DE, DA, DO> : DatabaseContent<DE>, ObservableObject {
+internal class DB_NativeType<DateType, DataType, DocumentType, IDType, TagType> : DatabaseContent<DateType, IDType, TagType>, ObservableObject {
 
     /// The Name of the SF-Symbol representing what this
     /// Database Content is
-    @Published internal var iconName : DA
-    
-    @Published internal var documents : [DO]
-    
+    @Published internal var iconName : DataType
+
+    /// The documents mapped to this native type in the database
+    @Published internal var documents : [DocumentType]
+
+    /// The notes (not DB\_Notes) but rather a string
+    @Published internal var details : DataType
+
+
     internal init(
-        iconName: DA,
-        documents : [DO],
-        created : DE,
-        lastEdited : DE,
-        id : UUID
+        iconName: DataType,
+        documents : [DocumentType],
+        details : DataType,
+        createdDate : DateType,
+        lastEditedDate : DateType,
+        lastAccessedDate : DateType,
+        id : IDType,
+        tags: [TagType]
     ) {
         self.iconName = iconName
         self.documents = documents
-        super.init(created: created, lastEdited: lastEdited, id: id)
+        self.details = details
+        super.init(
+            createdDate: createdDate,
+            lastEditedDate: lastEditedDate,
+            lastAccessedDate: lastAccessedDate,
+            id: id,
+            tags: tags
+        )
     }
 }

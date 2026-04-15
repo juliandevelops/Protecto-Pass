@@ -8,8 +8,9 @@
 import Foundation
 
 internal enum CryptoError : Error {
+    case errDerivation
     case errUnlocking
     case errLocking
     case unknownEncryption
-    case errRandomVytesGeneration
+    case errRandomBytesGeneration
 }

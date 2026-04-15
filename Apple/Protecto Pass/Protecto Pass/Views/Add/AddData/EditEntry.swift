@@ -17,7 +17,9 @@ internal struct EditEntry: View {
     @Environment(\.managedObjectContext) private var context
     
     @Environment(\.dismiss) private var dismiss
-    
+
+    @EnvironmentObject private var vaultSession : VaultSession
+
     /// The Database to store this Object in
     @EnvironmentObject private var db : Database
     
@@ -38,9 +40,9 @@ internal struct EditEntry: View {
     /// The URL to where the entry is connected to
     @State private var url : String = ""
     
-    /// Some Notes to this Entry
-    @State private var notes : String = ""
-    
+    /// Some details to this Entry
+    @State private var details : String = ""
+
     @State private var documents : [DB_Document] = []
     
     /// Whether or not an error has appeared storing the Database
@@ -54,12 +56,13 @@ internal struct EditEntry: View {
     
     @State private var filePickerPresented : Bool = false
     
-    internal init(entry : Entry, superID: UUID) {
+    internal init(entry : DB_Entry, superID: UUID) {
         self.title = entry.title
-        self.username = entry.username
-        self.password = entry.password
+        // TODO: update entry username and password here
+        self.username = "entry.encryptedUsername"
+        self.password = "entry.encryptedPassword"
         self.url = entry.url?.absoluteString ?? ""
-        self.notes = entry.notes
+        self.details = entry.details
         self.iconName = entry.iconName
         self.superID = superID
     }
@@ -162,39 +165,42 @@ internal struct EditEntry: View {
     
     /// Saves the data and dismisses this View
     private func save() -> Void {
-        var localDocuments : [LoadableResource] = []
+        var localDocuments : [DB_LoadableResource] = []
         for doc in documents {
             localDocuments.append(
-                LoadableResource(
+                DB_LoadableResource(
                     id: doc.id,
                     name: doc.name,
                     thumbnailData: DataConverter.stringToData("doc")
                 )
             )
         }
-        var newElements : [DatabaseContent<Date>] = []
+        var newElements : [DatabaseContent<Date, UUID, DB_Tag>] = []
         newElements.append(contentsOf: documents)
         newElements.append(
-            Entry(
+            DB_Entry(
                 title: title,
-                username: username,
-                password: password,
+                encryptedUsername: Data(), // TODO: update username and password in new entry
+                encryptedPassword: Data(),
                 url: URL(string: url),
-                notes: notes,
+                details: details,
                 iconName: iconName,
                 documents: localDocuments,
-                created: Date.now,
-                lastEdited: Date.now,
-                id: UUID()
+                createdDate: Date.now,
+                lastEditedDate: Date.now,
+                lastAccessedDate: Date.now,
+                id: UUID(),
+                tags: [] // TODO: update tags
             )
         )
         do {
-            try Storage.storeDatabase(
-                db,
-                context: context,
-                newElements: newElements,
-                superID: superID
-            )
+            try vaultSession.store(context: context)
+//            try Storage.storeDatabase(
+//                db,
+//                context: context,
+//                newElements: newElements,
+//                superID: superID
+//            )
             dismiss()
         } catch {
             errStoring.toggle()

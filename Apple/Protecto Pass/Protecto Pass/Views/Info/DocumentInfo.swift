@@ -20,8 +20,9 @@ internal struct DocumentInfo: View {
                 ListTile(name: "Type", data: document.type)
             }
             Section("Timeline") {
-                ListTile(name: "Created", date: document.created)
-                ListTile(name: "Last Edited", date: document.lastEdited)
+                ListTile(name: "Created", date: document.createdDate)
+                ListTile(name: "Last Edited", date: document.lastEditedDate)
+                ListTile(name: "Last accessed", date: document.lastAccessedDate)
             }
         }
     }
@@ -33,9 +34,11 @@ internal struct DocumentInfo: View {
             document: Data(),
             type: "txt",
             name: "Test Document",
-            created: Date.now,
-            lastEdited: Date.now,
-            id: UUID()
+            createdDate: Date.now,
+            lastEditedDate: Date.now,
+            lastAccessedDate: Date.now,
+            id: UUID(),
+            tags: []
         )
     )
 }

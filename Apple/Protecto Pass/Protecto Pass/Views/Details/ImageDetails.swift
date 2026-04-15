@@ -18,8 +18,8 @@ internal struct ImageDetails: View {
     @EnvironmentObject private var db : Database
     
     /// The Image displayed in this View
-    @State internal var image : LoadableResource?
-    
+    @State internal var image : DB_LoadableResource?
+
     @State internal var loadedImage : DB_Image?
     
     /// Binding to show the deletion confirmation dialog
@@ -90,8 +90,8 @@ internal struct ImageDetails: View {
 
 internal struct ImageDetails_Previews: PreviewProvider {
     
-    @State static private var image : LoadableResource = LoadableResource(id: UUID(), thumbnailData: Data())
-    
+    @State static private var image : DB_LoadableResource = DB_LoadableResource(id: UUID(), thumbnailData: Data())
+
     @State static private var deleted : Bool = false
     
     static var previews: some View {

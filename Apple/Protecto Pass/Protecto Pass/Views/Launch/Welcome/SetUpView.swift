@@ -56,7 +56,7 @@ internal struct SetUpView: View {
     private func load() -> Void {
         do {
             // TODO: change array
-            databases = try Storage.load(with: viewContext, and: [])
+            databases = try Storage.load(with: viewContext, usingFilepaths: [])
             isReady.toggle()
         } catch {
             errInitPresented.toggle()
