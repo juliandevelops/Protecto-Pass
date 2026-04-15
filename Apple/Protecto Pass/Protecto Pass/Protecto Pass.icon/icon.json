@@ -1,0 +1,37 @@
+{
+  "fill" : {
+    "automatic-gradient" : "display-p3:0.49894,0.28077,0.97287,1.00000"
+  },
+  "groups" : [
+    {
+      "layers" : [
+        {
+          "image-name" : "Protecto Pass Shield Holo without bg.png",
+          "name" : "Protecto Pass Shield Holo without bg",
+          "opacity" : 0.9,
+          "position" : {
+            "scale" : 1.1,
+            "translation-in-points" : [
+              0,
+              40.82499999999993
+            ]
+          }
+        }
+      ],
+      "shadow" : {
+        "kind" : "neutral",
+        "opacity" : 0.5
+      },
+      "translucency" : {
+        "enabled" : true,
+        "value" : 0.5
+      }
+    }
+  ],
+  "supported-platforms" : {
+    "circles" : [
+      "watchOS"
+    ],
+    "squares" : "shared"
+  }
+}

@@ -1,9 +1,0 @@
-
-/* German Localization for the Settings Bundle Legal Page */
-
-"Legal" = "Rechtliches";
-"legal_footer_text" = "";
-"Copyright" = "Copyright";
-"copyright_footer_text" = "© 2023 Julian Schumacher";
-"Additional Legal Information" = "Weitere rechtliche Informationen";
-"additional_legal_footer_text" = "Keine weiteren rechtlichen Informationen";

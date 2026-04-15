@@ -1,9 +1,0 @@
-
-/* French Localization for the Settings Bundle Legal Page */
-
-"Legal" = "Légal";
-"legal_footer_text" = "";
-"Copyright" = "droits d'auteur";
-"copyright_footer_text" = "© 2023 Julian Schumacher";
-"Additional Legal Information" = "Informations juridiques supplémentaires";
-"additional_legal_footer_text" = "Une déclaration de cryptage pour cette application a été déposée pour la France";
